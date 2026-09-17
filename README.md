@@ -56,9 +56,14 @@
         <!-- Operating Information Banner -->
         <div class="bg-white rounded-2xl p-4 sm:p-5 mb-6 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="space-y-1">
-                <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
-                    <i class="fa-regular fa-clock"></i> 부스 운영 안내
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+                        <i class="fa-regular fa-clock"></i> 부스 운영 안내
+                    </span>
+                    <span id="sync-status-badge" class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
+                        <i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> 연결 확인 중...
+                    </span>
+                </div>
                 <h2 class="text-base font-bold text-slate-800">예약 시간대를 선택하여 신청해 주세요</h2>
                 <p class="text-xs text-slate-500">각 시간대별 정원은 <strong class="text-indigo-600 font-semibold">최대 4명</strong>이며, 선착순 마감됩니다.</p>
             </div>
@@ -69,82 +74,63 @@
         </div>
 
         <!-- Day Selection Tabs -->
-        <div class="flex bg-slate-200/70 p-1.5 rounded-2xl mb-6 max-w-md mx-auto shadow-inner">
+        <div class="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1 mb-6 border border-slate-200/60 shadow-inner">
             <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm">
-                <i class="fa-regular fa-calendar-check"></i>
-                <span>금요일 (Day 1)</span>
+                <i class="fa-solid fa-calendar-day"></i>
+                <span>1일차 : 금요일</span>
             </button>
             <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2">
-                <i class="fa-regular fa-calendar-check"></i>
-                <span>토요일 (Day 2)</span>
+                <i class="fa-solid fa-calendar-day"></i>
+                <span>2일차 : 토요일</span>
             </button>
         </div>
 
-        <!-- Sessions Container -->
-        <div id="time-slots-container" class="space-y-6">
-            <!-- Dynamic Loading Skeleton -->
-            <div class="text-center py-12 bg-white rounded-2xl border border-slate-200/80">
-                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-500 mb-3"></i>
-                <p class="text-sm text-slate-500">실시간 예약 현황을 불러오는 중입니다...</p>
-            </div>
-        </div>
+        <!-- Dynamic Time Slots Container -->
+        <div id="time-slots-container" class="space-y-6"></div>
+
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-12 text-center text-xs space-y-1">
-        <p class="font-medium text-slate-300">🔬 과학대제전 학생 체험부스 예약 시스템</p>
-        <p class="text-slate-500">운영시간: 10:00~12:00 / 13:00~15:00 / 15:00~17:00 (10분 간격)</p>
-        <p class="text-[10px] text-slate-600 pt-1">
-            <button onclick="openAdminAuthModal()" class="hover:text-slate-400 underline">관리자 기기(MAC) 인가등록</button>
-            (단축키: Ctrl + Shift + A)
-        </p>
-    </footer>
-
-    <!-- Reservation Modal -->
+    <!-- Booking Input Modal -->
     <div id="booking-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-fade-in relative">
-            <button onclick="closeBookingModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 transition-all">
-                <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-5">
-                <div class="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 font-bold">
-                    <i class="fa-solid fa-ticket text-lg"></i>
-                </div>
+            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
                 <div>
-                    <h3 class="font-bold text-lg text-slate-800">체험부스 예약하기</h3>
-                    <p id="modal-slot-info" class="text-xs text-indigo-600 font-semibold">금요일 | 10:00 - 10:10</p>
+                    <span class="bg-indigo-100 text-indigo-700 text-[11px] font-bold px-2.5 py-1 rounded-md">예약 신청</span>
+                    <h3 id="modal-slot-info" class="text-base font-bold text-slate-800 mt-1">금요일 | 10:00 - 10:10</h3>
                 </div>
+                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
 
-            <form id="booking-form" onsubmit="handleBookingSubmit(event)" class="space-y-4">
+            <form onsubmit="handleBookingSubmit(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">예약자 성함 <span class="text-red-500">*</span></label>
-                    <input type="text" id="guest-name" required placeholder="이름을 입력하세요 (예: 홍길동)" 
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">예약자 성명 <span class="text-red-500">*</span></label>
+                    <input type="text" id="guest-name" required placeholder="홍길동" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">연락처 또는 학번 <span class="text-red-500">*</span></label>
-                    <input type="text" id="guest-phone" required placeholder="010-0000-0000 또는 학번" 
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">연락처 / 학번 <span class="text-red-500">*</span></label>
+                    <input type="text" id="guest-phone" required placeholder="010-1234-5678 또는 학번" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">예약 인원 <span class="text-red-500">*</span></label>
-                    <select id="guest-count" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-white">
-                        <!-- Options generated dynamically -->
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">예약 인원 <span class="text-red-500">*</span></label>
+                    <select id="guest-count" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                        <option value="1">1명</option>
                     </select>
-                    <p id="remaining-hint" class="text-[11px] text-slate-400 mt-1">* 해당 시간대에 신청 가능한 남은 정원 내에서 선택 가능합니다.</p>
                 </div>
 
-                <div class="pt-3 flex gap-2">
-                    <button type="button" onclick="closeBookingModal()" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-bold text-sm transition-all">
-                        취소
-                    </button>
-                    <button type="submit" id="submit-booking-btn" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-sm shadow-md shadow-indigo-200 transition-all flex items-center justify-center gap-2">
-                        <span>예약 완료하기</span>
-                    </button>
+                <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800 flex gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-sm flex-shrink-0 mt-0.5"></i>
+                    <div>
+                        <strong>주의:</strong> 예약 후 노쇼 방지를 위해 지정된 시간에 부스를 꼭 방문해 주세요.
+                    </div>
+                </div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeBookingModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
+                    <button type="submit" id="submit-booking-btn" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">예약 완료하기</button>
                 </div>
             </form>
         </div>
@@ -226,6 +212,10 @@
                     <h2 class="font-bold text-base">과학대제전 예약관리 모드</h2>
                 </div>
                 <div class="flex items-center gap-2">
+                    <button onclick="openFirebaseConfigModal()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                        <i class="fa-solid fa-database text-indigo-200"></i>
+                        <span>Firebase 연동 설정</span>
+                    </button>
                     <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-all">
                         <i class="fa-solid fa-file-csv text-emerald-400"></i>
                         <span>CSV 다운로드</span>
@@ -297,55 +287,129 @@
     <!-- Custom Toast Alert Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- Firebase Config Setup Modal for GitHub Pages -->
+    <div id="firebase-config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-fire text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800">Firebase 실시간 DB 연동 설정</h3>
+                        <p class="text-xs text-slate-500">GitHub Pages에서 여러 기기간 실시간 동기화를 위해 필요합니다.</p>
+                    </div>
+                </div>
+                <button onclick="closeFirebaseConfigModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <form onsubmit="saveCustomFirebaseConfig(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Firebase Config (JSON 객체)</label>
+                    <textarea id="firebase-config-json" rows="6" required placeholder='{
+  "apiKey": "AIzaSy...",
+  "authDomain": "your-app.firebaseapp.com",
+  "projectId": "your-app",
+  "storageBucket": "your-app.appspot.com",
+  "messagingSenderId": "123456...",
+  "appId": "1:123456...:web:..."
+}' class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></textarea>
+                </div>
+                <div class="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl space-y-1">
+                    <p class="font-semibold text-slate-700">💡 설정 팁:</p>
+                    <p>• Firebase Console에서 웹 프로젝트를 추가하고 발급받은 `firebaseConfig` 객체를 붙여넣으세요.</p>
+                    <p>• 미입력 시에는 이 기기 안에서 작동하는 **로컬 저장소 모드**로 안심하고 테스트할 수 있습니다.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-slate-100 text-red-600 hover:bg-slate-200 rounded-xl font-medium text-xs">설정 초기화</button>
+                    <button type="button" onclick="closeFirebaseConfigModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium text-xs">취소</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md">저장 및 다시로드</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase & Logic Module -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config Setup
+        // Check for Custom Stored Firebase Config (GitHub Pages Deployment)
+        const storedConfigStr = localStorage.getItem('custom_firebase_config');
+        let firebaseConfig = null;
+
+        if (storedConfigStr) {
+            try {
+                firebaseConfig = JSON.parse(storedConfigStr);
+            } catch(e) {
+                console.error("Invalid custom firebase config", e);
+            }
+        }
+
+        if (!firebaseConfig) {
+            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+                apiKey: "AIzaSyDummyKeyForLocalPreviewExecutionOnly",
+                authDomain: "demo-app.firebaseapp.com",
+                projectId: "demo-app",
+                storageBucket: "demo-app.appspot.com",
+                messagingSenderId: "123456789",
+                appId: "1:123456789:web:abcdef"
+            };
+        }
+
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'science-fair-2026';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyDummyKeyForLocalPreviewExecutionOnly",
-            authDomain: "demo-app.firebaseapp.com",
-            projectId: "demo-app",
-            storageBucket: "demo-app.appspot.com",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef"
-        };
+        let app = null, auth = null, db = null, reservationsRef = null;
+        let isFirebaseReady = false;
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Firestore Collection Reference
-        const reservationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'science_reservations');
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            reservationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'science_reservations');
+        } catch(e) {
+            console.warn("Firebase initialization warning:", e);
+        }
 
         // Application Global State
-        let currentDay = 'fri'; // 'fri' or 'sat'
-        let reservations = []; // Real-time cached documents
-        let selectedSlot = null; // Currently selected slot object
+        let currentDay = 'fri';
+        let reservations = [];
+        let selectedSlot = null;
         let currentAdminFilter = 'all';
 
-        // Session Definitions (1부: 10~12시, 2부: 13~15시, 3부: 15~17시)
+        // Helper: Update Sync Status Badge
+        function updateSyncBadge(status, text) {
+            const badge = document.getElementById('sync-status-badge');
+            if (!badge) return;
+            if (status === 'online') {
+                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md";
+                badge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i> ${text || '실시간 DB 연결됨'}`;
+            } else if (status === 'local') {
+                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md";
+                badge.innerHTML = `<i class="fa-solid fa-hard-drive text-amber-500"></i> ${text || '로컬 모드 (GitHub Pages)'}`;
+            } else {
+                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md";
+                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> ${text || '연결 중...'}`;
+            }
+        }
+
         const SESSIONS = [
             { id: 1, title: '1부 (오전)', start: '10:00', end: '12:00' },
             { id: 2, title: '2부 (오후 1차)', start: '13:00', end: '15:00' },
             { id: 3, title: '3부 (오후 2차)', start: '15:00', end: '17:00' }
         ];
 
-        // Target Authorized Network Identifiers (DESKTOP-DMEHFG7)
         const AUTHORIZED_IDENTIFIERS = [
-            '00FFB92A831C', // TAP-Windows Adapter V9
-            '0E815030FA43', // Wi-Fi (Intel Wi-Fi 6E AX211)
-            '4C496C10A26C', // Wi-Fi Direct Virtual Adapter
-            '4E496C10A26B', // Wi-Fi Direct Virtual Adapter #2
-            '4C496C10A26F', // Bluetooth Device
-            '00155D663800', // Hyper-V Virtual Adapter
-            '10.158.136.227' // Current IPv4 Address
+            '00FFB92A831C',
+            '0E815030FA43',
+            '4C496C10A26C',
+            '4E496C10A26B',
+            '4C496C10A26F',
+            '00155D663800',
+            '10.158.136.227'
         ];
 
-        // Helper: Generate array of 10-minute interval times [ "10:00", "10:10", ... "11:50" ]
         function generateTimesForSession(startStr, endStr) {
             const times = [];
             let [h, m] = startStr.split(':').map(Number);
@@ -364,40 +428,82 @@
             return times;
         }
 
-        // Real-Time Firestore Listener Function
         function listenToReservations() {
-            onSnapshot(reservationsRef, (snapshot) => {
-                reservations = [];
-                snapshot.forEach((docSnap) => {
-                    reservations.push({ id: docSnap.id, ...docSnap.data() });
+            if (!db || firebaseConfig.apiKey.includes("DummyKey")) {
+                loadLocalReservations();
+                updateSyncBadge('local', '로컬 단독 모드 (GitHub Pages)');
+                return;
+            }
+
+            try {
+                onSnapshot(reservationsRef, (snapshot) => {
+                    isFirebaseReady = true;
+                    reservations = [];
+                    snapshot.forEach((docSnap) => {
+                        reservations.push({ id: docSnap.id, ...docSnap.data() });
+                    });
+                    localStorage.setItem('cached_science_reservations', JSON.stringify(reservations));
+                    updateSyncBadge('online', '실시간 DB 연동 완료');
+                    renderTimeSlots();
+                    updateAdminStats();
+                    const adminModal = document.getElementById('admin-dashboard-modal');
+                    if (adminModal && !adminModal.classList.contains('hidden')) {
+                        renderAdminTable();
+                    }
+                }, (error) => {
+                    console.warn("Firestore listener disconnected, falling back to local storage:", error);
+                    isFirebaseReady = false;
+                    loadLocalReservations();
+                    updateSyncBadge('local', '로컬 모드');
                 });
-                renderTimeSlots();
-                updateAdminStats();
-                const adminModal = document.getElementById('admin-dashboard-modal');
-                if (adminModal && !adminModal.classList.contains('hidden')) {
-                    renderAdminTable();
-                }
-            }, (error) => {
-                console.error("Error listening to reservations:", error);
-                showToast("예약 정보를 불러오는 중 오류가 발생했습니다.", "error");
-            });
+            } catch(e) {
+                console.warn("Firestore setup failed:", e);
+                isFirebaseReady = false;
+                loadLocalReservations();
+                updateSyncBadge('local', '로컬 모드');
+            }
         }
 
-        // Initialize App & Auth
-        window.addEventListener('load', async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+        function loadLocalReservations() {
+            const saved = localStorage.getItem('cached_science_reservations');
+            if (saved) {
+                try {
+                    reservations = JSON.parse(saved);
+                } catch(e) {
+                    reservations = [];
                 }
-                
-                checkDeviceMacAuthorization();
-                listenToReservations();
-            } catch (err) {
-                console.error("Auth / Init error:", err);
-                showToast("시스템 연결 중 오류가 발생했습니다.", "error");
             }
+            renderTimeSlots();
+            updateAdminStats();
+        }
+
+        function saveLocalReservations() {
+            localStorage.setItem('cached_science_reservations', JSON.stringify(reservations));
+            renderTimeSlots();
+            updateAdminStats();
+            const adminModal = document.getElementById('admin-dashboard-modal');
+            if (adminModal && !adminModal.classList.contains('hidden')) {
+                renderAdminTable();
+            }
+        }
+
+        window.addEventListener('load', async () => {
+            checkDeviceMacAuthorization();
+
+            if (auth && firebaseConfig && !firebaseConfig.apiKey.includes("DummyKey")) {
+                try {
+                    const authPromise = (typeof __initial_auth_token !== 'undefined' && __initial_auth_token)
+                        ? signInWithCustomToken(auth, __initial_auth_token)
+                        : signInAnonymously(auth);
+                    
+                    const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 3000));
+                    await Promise.race([authPromise, authTimeout]);
+                } catch (err) {
+                    console.warn("Firebase auth warning (using local mode):", err);
+                }
+            }
+
+            listenToReservations();
         });
 
         window.renderTimeSlots = function() {
@@ -481,7 +587,6 @@
             });
         };
 
-        // Day Switch Handler
         window.switchDay = function(day) {
             currentDay = day;
             const tabFri = document.getElementById('tab-fri');
@@ -559,36 +664,61 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> 예약 처리 중...`;
             
-            try {
-                const ticketCode = 'SCI-' + Math.floor(1000 + Math.random() * 9000);
-                
-                await addDoc(reservationsRef, {
-                    day: selectedSlot.day,
-                    time: selectedSlot.time,
-                    name: name,
-                    phone: phone,
-                    partySize: count,
-                    ticketCode: ticketCode,
-                    createdAt: serverTimestamp()
-                });
-                
-                closeBookingModal();
-                
-                const dayKr = selectedSlot.day === 'fri' ? '금요일' : '토요일';
-                document.getElementById('ticket-code').innerText = `#${ticketCode}`;
-                document.getElementById('ticket-datetime').innerText = `${dayKr} ${selectedSlot.time}`;
-                document.getElementById('ticket-name').innerText = name;
-                document.getElementById('ticket-count').innerText = `${count}명`;
-                
-                document.getElementById('ticket-modal').classList.remove('hidden');
-                showToast("예약이 성공적으로 완료되었습니다!", "success");
-            } catch (err) {
-                console.error("Booking error:", err);
-                showToast("예약 중 오류가 발생했습니다. 다시 시도해 주세요.", "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = `<span>예약 완료하기</span>`;
+            const ticketCode = 'SCI-' + Math.floor(1000 + Math.random() * 9000);
+            const newRes = {
+                id: 'res-' + Date.now(),
+                day: selectedSlot.day,
+                time: selectedSlot.time,
+                name: name,
+                phone: phone,
+                partySize: count,
+                ticketCode: ticketCode,
+                createdAt: new Date().toISOString()
+            };
+
+            let savedToRemote = false;
+
+            if (isFirebaseReady && reservationsRef) {
+                try {
+                    const addPromise = addDoc(reservationsRef, {
+                        day: selectedSlot.day,
+                        time: selectedSlot.time,
+                        name: name,
+                        phone: phone,
+                        partySize: count,
+                        ticketCode: ticketCode,
+                        createdAt: serverTimestamp()
+                    });
+
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error('Firebase timeout')), 4000)
+                    );
+
+                    await Promise.race([addPromise, timeoutPromise]);
+                    savedToRemote = true;
+                } catch (err) {
+                    console.warn("Firebase save timed out or failed. Saved locally:", err);
+                }
             }
+
+            if (!savedToRemote) {
+                reservations.push(newRes);
+                saveLocalReservations();
+            }
+
+            closeBookingModal();
+            
+            const dayKr = selectedSlot.day === 'fri' ? '금요일' : '토요일';
+            document.getElementById('ticket-code').innerText = `#${ticketCode}`;
+            document.getElementById('ticket-datetime').innerText = `${dayKr} ${selectedSlot.time}`;
+            document.getElementById('ticket-name').innerText = name;
+            document.getElementById('ticket-count').innerText = `${count}명`;
+            
+            document.getElementById('ticket-modal').classList.remove('hidden');
+            showToast("예약이 성공적으로 완료되었습니다!", "success");
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<span>예약 완료하기</span>`;
         };
 
         window.closeTicketModal = function() {
@@ -646,7 +776,7 @@
 
         window.closeAdminAuthModal = function() {
             document.getElementById('admin-auth-modal').classList.add('hidden');
-            const macInput = document.getElementById('admin-mac-address').value = '';
+            document.getElementById('admin-mac-address').value = '';
             document.getElementById('auth-error-msg').classList.add('hidden');
         };
 
@@ -689,7 +819,8 @@
 
         window.renderAdminTable = function() {
             const tbody = document.getElementById('admin-table-body');
-            const searchKeyword = document.getElementById('admin-search-input').value.toLowerCase().trim();
+            const searchInput = document.getElementById('admin-search-input');
+            const searchKeyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
             tbody.innerHTML = '';
 
@@ -706,7 +837,7 @@
 
             filtered.sort((a, b) => {
                 if (a.day !== b.day) return a.day === 'fri' ? -1 : 1;
-                return a.time.localeCompare(b.time);
+                return (a.time || '').localeCompare(b.time || '');
             });
 
             if (filtered.length === 0) {
@@ -749,11 +880,18 @@
         window.deleteReservation = async function(docId) {
             if (!confirm("정말 이 예약을 취소/삭제하시겠습니까?")) return;
             try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'science_reservations', docId));
+                if (isFirebaseReady && db && !docId.startsWith('res-')) {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'science_reservations', docId));
+                } else {
+                    reservations = reservations.filter(r => r.id !== docId);
+                    saveLocalReservations();
+                }
                 showToast("예약이 삭제되었습니다.", "success");
             } catch (err) {
                 console.error("Delete error:", err);
-                showToast("삭제 도중 오류가 발생했습니다.", "error");
+                reservations = reservations.filter(r => r.id !== docId);
+                saveLocalReservations();
+                showToast("로컬에서 예약이 삭제되었습니다.", "success");
             }
         };
 
@@ -788,6 +926,45 @@
             a.click();
             URL.revokeObjectURL(url);
             showToast("CSV 파일이 다운로드되었습니다.", "success");
+        };
+
+        // Firebase Custom Config Modals for GitHub Pages
+        window.openFirebaseConfigModal = function() {
+            const modal = document.getElementById('firebase-config-modal');
+            const textarea = document.getElementById('firebase-config-json');
+            const existing = localStorage.getItem('custom_firebase_config');
+            if (existing && textarea) {
+                textarea.value = existing;
+            }
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeFirebaseConfigModal = function() {
+            const modal = document.getElementById('firebase-config-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.saveCustomFirebaseConfig = function(e) {
+            e.preventDefault();
+            const val = document.getElementById('firebase-config-json').value.trim();
+            try {
+                const parsed = JSON.parse(val);
+                if (!parsed.apiKey || !parsed.projectId) {
+                    showToast("유효한 Firebase Config (apiKey, projectId)가 필요합니다.", "error");
+                    return;
+                }
+                localStorage.setItem('custom_firebase_config', JSON.stringify(parsed));
+                showToast("Firebase 설정이 저장되었습니다. 연결을 재시도합니다.", "success");
+                setTimeout(() => location.reload(), 1200);
+            } catch(err) {
+                showToast("올바른 JSON 형식이 아닙니다. 다시 확인해 주세요.", "error");
+            }
+        };
+
+        window.clearFirebaseConfig = function() {
+            localStorage.removeItem('custom_firebase_config');
+            showToast("Firebase 설정이 초기화되었습니다.", "info");
+            setTimeout(() => location.reload(), 1200);
         };
 
         function showToast(message, type = 'info') {
