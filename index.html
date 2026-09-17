@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -30,7 +31,7 @@
     <!-- Header / Navigation Bar -->
     <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()" title="관리자 기기 승인 (5회 연속 클릭)">
+            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()">
                 <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0">
                     <i class="fa-solid font-bold fa-flask-vial text-xl text-indigo-200"></i>
                 </div>
@@ -417,6 +418,9 @@
 
         // Initialize Authentication and Real-time Firestore Sync
         async function initApp() {
+            if (localStorage.getItem('admin_authorized') === 'true') {
+                enableAdminButton();
+            }
             loadLocalReservations();
             renderTimeSlots();
 
@@ -480,8 +484,8 @@
                 start: '10:00', 
                 end: '12:00',
                 subGroups: [
-                    { id: '1-1', title: '10시~11시', start: '10:00', end: '11:00' },
-                    { id: '1-2', title: '11시~12시', start: '11:00', end: '12:00' }
+                    { id: '1-1', title: '10시 시간대', start: '10:00', end: '11:00' },
+                    { id: '1-2', title: '11시 시간대', start: '11:00', end: '12:00' }
                 ]
             },
             { 
@@ -490,8 +494,8 @@
                 start: '13:00', 
                 end: '15:00',
                 subGroups: [
-                    { id: '2-1', title: '13시~14시', start: '13:00', end: '14:00' },
-                    { id: '2-2', title: '14시~15시', start: '14:00', end: '15:00' }
+                    { id: '2-1', title: '13시 시간대', start: '13:00', end: '14:00' },
+                    { id: '2-2', title: '14시 시간대', start: '14:00', end: '15:00' }
                 ]
             },
             { 
@@ -500,14 +504,23 @@
                 start: '15:00', 
                 end: '17:00',
                 subGroups: [
-                    { id: '3-1', title: '15시~16시', start: '15:00', end: '16:00' },
-                    { id: '3-2', title: '16시~17시', start: '16:00', end: '17:00' }
+                    { id: '3-1', title: '15시 시간대', start: '15:00', end: '16:00' },
+                    { id: '3-2', title: '16시 시간대', start: '16:00', end: '17:00' }
                 ]
             }
         ];
 
         // Master PIN Authorization Code
         const MASTER_PIN = '6807146';
+
+        function enableAdminButton() {
+            localStorage.setItem('admin_authorized', 'true');
+            const adminBtn = document.getElementById('admin-btn');
+            if (adminBtn) {
+                adminBtn.classList.remove('hidden');
+                adminBtn.classList.add('flex');
+            }
+        }
 
         window.renderTimeSlots = function() {
             const container = document.getElementById('time-slots-container');
