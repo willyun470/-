@@ -1,7 +1,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>과학대제전 체험부스 실시간 예약 시스템</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,9 +13,11 @@
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             background-color: #f8fafc;
+            min-height: 100vh;
+            min-height: 100dvh;
         }
         .animate-fade-in {
-            animation: fadeIn 0.25s ease-out forwards;
+            animation: fadeIn 0.2s ease-out forwards;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(6px); }
@@ -23,26 +25,26 @@
         }
     </style>
 </head>
-<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col">
+<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col justify-between antialiased">
 
-    <!-- Navigation Bar -->
-    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-30">
+    <!-- Header / Navigation Bar -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()" title="기기 MAC 인증 (5회 연속 클릭)">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20">
+            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()" title="관리자 기기 승인 (5회 연속 클릭)">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0">
                     <i class="fa-solid font-bold fa-flask-vial text-xl text-indigo-200"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+                    <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-1.5 flex-wrap">
                         과학대제전 체험부스
-                        <span class="bg-indigo-500/60 text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-400/30">실시간 예약</span>
+                        <span class="bg-indigo-500/60 text-[10px] sm:text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-400/30">실시간 예약</span>
                     </h1>
-                    <p class="text-xs text-indigo-200">10분 간격 / 회차당 최대 4명 정원</p>
+                    <p class="text-[11px] sm:text-xs text-indigo-200">10분 간격 / 회차당 최대 4명 정원</p>
                 </div>
             </div>
             
-            <!-- Admin button: Only visible when MAC address is verified -->
-            <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold items-center gap-1.5 transition-all shadow-md">
+            <!-- Admin button: Secretly visible only on authorized devices -->
+            <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0">
                 <i class="fa-solid fa-user-shield text-xs"></i>
                 <span>관리자 모드</span>
             </button>
@@ -50,17 +52,14 @@
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+    <main class="max-w-5xl mx-auto px-3 sm:px-4 py-5 flex-grow w-full">
         
         <!-- Operating Information Banner -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 mb-6 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 mb-5 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div class="space-y-1">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
                         <i class="fa-regular fa-clock"></i> 부스 운영 안내
-                    </span>
-                    <span id="sync-status-badge" class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                        <i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> 연결 확인 중...
                     </span>
                 </div>
                 <h2 class="text-base font-bold text-slate-800">예약 시간대를 선택하여 신청해 주세요</h2>
@@ -73,25 +72,30 @@
         </div>
 
         <!-- Day Selection Tabs -->
-        <div class="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1 mb-6 border border-slate-200/60 shadow-inner">
-            <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm">
+        <div class="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1 mb-5 border border-slate-200/60 shadow-inner">
+            <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm">
                 <i class="fa-solid fa-calendar-day"></i>
                 <span>1일차 : 금요일</span>
             </button>
-            <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2">
+            <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-calendar-day"></i>
                 <span>2일차 : 토요일</span>
             </button>
         </div>
 
         <!-- Dynamic Time Slots Container -->
-        <div id="time-slots-container" class="space-y-6"></div>
+        <div id="time-slots-container" class="space-y-5"></div>
 
     </main>
 
+    <!-- Footer -->
+    <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-200/60 mt-6 bg-white">
+        과학대제전 체험부스 실시간 예약 시스템
+    </footer>
+
     <!-- Booking Input Modal -->
     <div id="booking-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-fade-in relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 animate-fade-in relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
                 <div>
                     <span class="bg-indigo-100 text-indigo-700 text-[11px] font-bold px-2.5 py-1 rounded-md">예약 신청</span>
@@ -115,7 +119,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">예약 인원 <span class="text-red-500">*</span></label>
-                    <select id="guest-count" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <select id="guest-count" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white">
                         <option value="1">1명</option>
                     </select>
                 </div>
@@ -127,7 +131,7 @@
                     </div>
                 </div>
 
-                <div class="flex gap-2 pt-2">
+                <div class="flex gap-2 pt-1">
                     <button type="button" onclick="closeBookingModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
                     <button type="submit" id="submit-booking-btn" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">예약 완료하기</button>
                 </div>
@@ -142,7 +146,7 @@
                 <i class="fa-solid fa-circle-check"></i>
             </div>
             <h3 class="text-xl font-bold text-slate-800 mb-1">예약이 완료되었습니다!</h3>
-            <p class="text-xs text-slate-500 mb-5">부스 방문 시 아래 예약 정보를 보여주세요.</p>
+            <p class="text-xs text-slate-500 mb-4">부스 방문 시 아래 예약 정보를 보여주세요.</p>
 
             <div class="bg-indigo-50/70 rounded-2xl p-4 text-left border border-indigo-100 mb-5 space-y-2 text-xs">
                 <div class="flex justify-between border-b border-indigo-100/60 pb-2">
@@ -169,32 +173,25 @@
         </div>
     </div>
 
-    <!-- Admin Auth MAC Address Modal -->
+    <!-- Admin Auth Modal (Master PIN Input) -->
     <div id="admin-auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
             <div class="text-center mb-4">
                 <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
-                    <i class="fa-solid fa-laptop-code"></i>
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <h3 class="font-bold text-slate-800">관리자 기기(MAC) 인증</h3>
-                <p class="text-xs text-slate-500 mt-0.5">등록된 관리자 컴퓨터의 물리주소를 확인합니다.</p>
+                <h3 class="font-bold text-slate-800">관리자 인증</h3>
+                <p class="text-xs text-slate-500 mt-0.5">마스터 PIN 번호를 입력해 주세요.</p>
             </div>
             <form onsubmit="handleAdminAuth(event)" class="space-y-3">
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">인가 대상 물리주소 (MAC Address)</label>
-                    <input type="text" id="admin-mac-address" placeholder="00-FF-B9-2A-83-1C" required autofocus
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 uppercase">
+                    <input type="password" id="admin-pin-input" placeholder="PIN 번호 입력" required autofocus autocomplete="off"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                 </div>
-                <p id="auth-error-msg" class="text-[11px] text-red-500 text-center hidden">허가되지 않은 기기 물리주소(MAC)입니다.</p>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
-                    <p class="font-semibold text-slate-700 flex items-center gap-1">
-                        <i class="fa-solid fa-circle-info text-indigo-500"></i> 기기 검증 안내
-                    </p>
-                    <p class="text-[10px] leading-relaxed">이 컴퓨터(<code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700 font-bold">DESKTOP-DMEHFG7</code>)의 고유 주소(<code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700 font-bold">0E-81-50-30-FA-43</code> 또는 <code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700 font-bold">00-FF-B9-2A-83-1C</code>)를 입력하면 이 기기가 등록되어 전용 관리자 모드가 지속적으로 활성화됩니다.</p>
-                </div>
+                <p id="auth-error-msg" class="text-[11px] text-red-500 text-center hidden">비밀번호(PIN)가 일치하지 않습니다.</p>
                 <div class="flex gap-2 pt-1">
                     <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm">기기 인증 및 입장</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm">인증하기</button>
                 </div>
             </form>
         </div>
@@ -205,19 +202,19 @@
         <div class="bg-white rounded-3xl max-w-4xl w-full h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-fade-in">
             
             <!-- Admin Header -->
-            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center flex-shrink-0">
+            <div class="bg-slate-900 text-white px-5 sm:px-6 py-3.5 flex justify-between items-center flex-shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full border border-emerald-500/30 font-semibold">Admin Mode</span>
-                    <h2 class="font-bold text-base">과학대제전 예약관리 모드</h2>
+                    <h2 class="font-bold text-sm sm:text-base">과학대제전 예약관리 모드</h2>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="openFirebaseConfigModal()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
                         <i class="fa-solid fa-database text-indigo-200"></i>
-                        <span>Firebase 연동 설정</span>
+                        <span class="hidden sm:inline">Firebase DB 설정</span>
                     </button>
                     <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-all">
                         <i class="fa-solid fa-file-csv text-emerald-400"></i>
-                        <span>CSV 다운로드</span>
+                        <span class="hidden sm:inline">CSV 다운로드</span>
                     </button>
                     <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-800">
                         <i class="fa-solid fa-xmark text-lg"></i>
@@ -226,28 +223,28 @@
             </div>
 
             <!-- Admin Stats Bar -->
-            <div class="bg-slate-100/80 px-6 py-3 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 flex-shrink-0">
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">금요일 총 예약인원</p>
-                    <p id="stat-fri-count" class="text-lg font-bold text-indigo-600">0 / 144 명</p>
+            <div class="bg-slate-100/80 px-4 sm:px-6 py-3 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2.5 flex-shrink-0">
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">금요일 총 예약인원</p>
+                    <p id="stat-fri-count" class="text-base sm:text-lg font-bold text-indigo-600">0 / 144 명</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">토요일 총 예약인원</p>
-                    <p id="stat-sat-count" class="text-lg font-bold text-indigo-600">0 / 144 명</p>
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">토요일 총 예약인원</p>
+                    <p id="stat-sat-count" class="text-base sm:text-lg font-bold text-indigo-600">0 / 144 명</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">전체 총 예약건수</p>
-                    <p id="stat-total-res" class="text-lg font-bold text-slate-800">0 건</p>
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">전체 총 예약건수</p>
+                    <p id="stat-total-res" class="text-base sm:text-lg font-bold text-slate-800">0 건</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">전체 방문 예정 인원</p>
-                    <p id="stat-total-people" class="text-lg font-bold text-emerald-600">0 명</p>
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">전체 방문 예정 인원</p>
+                    <p id="stat-total-people" class="text-base sm:text-lg font-bold text-emerald-600">0 명</p>
                 </div>
             </div>
 
             <!-- Admin Filters & Table -->
-            <div class="p-6 flex-grow flex flex-col overflow-hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-4 flex-shrink-0">
+            <div class="p-4 sm:p-6 flex-grow flex flex-col overflow-hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 mb-4 flex-shrink-0">
                     <div class="flex items-center gap-2">
                         <button id="admin-filter-all" onclick="filterAdminData('all')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">전체</button>
                         <button id="admin-filter-fri" onclick="filterAdminData('fri')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-600 hover:bg-slate-300">금요일</button>
@@ -283,10 +280,10 @@
         </div>
     </div>
 
-    <!-- Custom Toast Alert Container -->
+    <!-- Toast Alert Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Firebase Config Setup Modal for GitHub Pages -->
+    <!-- Firebase Config Setup Modal -->
     <div id="firebase-config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
             <div class="flex items-center justify-between mb-4">
@@ -296,7 +293,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-slate-800">Firebase 실시간 DB 연동 설정</h3>
-                        <p class="text-xs text-slate-500">GitHub Pages에서 여러 기기간 실시간 동기화를 위해 필요합니다.</p>
+                        <p class="text-xs text-slate-500">여러 기기간 실시간 동기화를 위해 필요합니다.</p>
                     </div>
                 </div>
                 <button onclick="closeFirebaseConfigModal()" class="text-slate-400 hover:text-slate-600">
@@ -306,7 +303,7 @@
             <form onsubmit="saveCustomFirebaseConfig(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Firebase Config (JSON 객체)</label>
-                    <textarea id="firebase-config-json" rows="6" required placeholder='{
+                    <textarea id="firebase-config-json" rows="5" required placeholder='{
   "apiKey": "AIzaSy...",
   "authDomain": "your-app.firebaseapp.com",
   "projectId": "your-app",
@@ -316,12 +313,12 @@
 }' class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></textarea>
                 </div>
                 <div class="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl space-y-1">
-                    <p class="font-semibold text-slate-700">💡 설정 팁:</p>
-                    <p>• Firebase Console에서 웹 프로젝트를 추가하고 발급받은 `firebaseConfig` 객체를 붙여넣으세요.</p>
-                    <p>• 미입력 시에는 이 기기 안에서 작동하는 **로컬 저장소 모드**로 안심하고 테스트할 수 있습니다.</p>
+                    <p class="font-semibold text-slate-700">💡 안내:</p>
+                    <p>• Firebase Console에서 웹 프로젝트를 추가하고 발급받은 config를 입력하세요.</p>
+                    <p>• 미입력 시에는 이 기기 안에서만 작동하는 **로컬 저장소 모드**로 테스트할 수 있습니다.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-slate-100 text-red-600 hover:bg-slate-200 rounded-xl font-medium text-xs">설정 초기화</button>
+                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-slate-100 text-red-600 hover:bg-slate-200 rounded-xl font-medium text-xs">초기화</button>
                     <button type="button" onclick="closeFirebaseConfigModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium text-xs">취소</button>
                     <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md">저장 및 다시로드</button>
                 </div>
@@ -329,22 +326,18 @@
         </div>
     </div>
 
-    <!-- Firebase & Logic Module -->
+    <!-- Firebase & Application Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Check for Custom Stored Firebase Config (GitHub Pages Deployment)
+        // Check Stored Firebase Config
         const storedConfigStr = localStorage.getItem('custom_firebase_config');
         let firebaseConfig = null;
 
         if (storedConfigStr) {
-            try {
-                firebaseConfig = JSON.parse(storedConfigStr);
-            } catch(e) {
-                console.error("Invalid custom firebase config", e);
-            }
+            try { firebaseConfig = JSON.parse(storedConfigStr); } catch(e) {}
         }
 
         if (!firebaseConfig) {
@@ -368,222 +361,298 @@
             db = getFirestore(app);
             reservationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'science_reservations');
         } catch(e) {
-            console.warn("Firebase initialization warning:", e);
+            console.warn("Firebase init warning:", e);
         }
 
-        // Application Global State
+        // Global State
         let currentDay = 'fri';
         let reservations = [];
         let selectedSlot = null;
         let currentAdminFilter = 'all';
 
-        // Helper: Update Sync Status Badge
-        function updateSyncBadge(status, text) {
-            const badge = document.getElementById('sync-status-badge');
-            if (!badge) return;
-            if (status === 'online') {
-                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md";
-                badge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i> ${text || '실시간 DB 연결됨'}`;
-            } else if (status === 'local') {
-                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md";
-                badge.innerHTML = `<i class="fa-solid fa-hard-drive text-amber-500"></i> ${text || '로컬 모드 (GitHub Pages)'}`;
-            } else {
-                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md";
-                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> ${text || '연결 중...'}`;
+        // Local Storage Helpers
+        function loadLocalReservations() {
+            try {
+                const stored = localStorage.getItem('science_reservations_' + appId);
+                if (stored) {
+                    reservations = JSON.parse(stored);
+                }
+            } catch(e) {
+                console.error("Local storage load error:", e);
             }
         }
 
-        const SESSIONS = [
-            { id: 1, title: '1부 (오전)', start: '10:00', end: '12:00' },
-            { id: 2, title: '2부 (오후 1차)', start: '13:00', end: '15:00' },
-            { id: 3, title: '3부 (오후 2차)', start: '15:00', end: '17:00' }
-        ];
+        function saveLocalReservations() {
+            try {
+                localStorage.setItem('science_reservations_' + appId, JSON.stringify(reservations));
+            } catch(e) {
+                console.error("Local storage save error:", e);
+            }
+        }
 
-        const AUTHORIZED_IDENTIFIERS = [
-            '00FFB92A831C',
-            '0E815030FA43',
-            '4C496C10A26C',
-            '4E496C10A26B',
-            '4C496C10A26F',
-            '00155D663800',
-            '10.158.136.227'
-        ];
-
-        function generateTimesForSession(startStr, endStr) {
+        // Time Slot Generator Utility (10 min interval)
+        function generateTimesForSession(startTime, endTime) {
             const times = [];
-            let [h, m] = startStr.split(':').map(Number);
-            const [endH, endM] = endStr.split(':').map(Number);
+            let [h, m] = startTime.split(':').map(Number);
+            const [endH, endM] = endTime.split(':').map(Number);
+            const endTotal = endH * 60 + endM;
 
-            while (h < endH || (h === endH && m < endM)) {
-                const formattedH = String(h).padStart(2, '0');
-                const formattedM = String(m).padStart(2, '0');
-                times.push(`${formattedH}:${formattedM}`);
+            while (h * 60 + m < endTotal) {
+                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                times.push(timeStr);
                 m += 10;
                 if (m >= 60) {
-                    m = 0;
+                    m -= 60;
                     h += 1;
                 }
             }
             return times;
         }
 
-        function listenToReservations() {
-            if (!db || firebaseConfig.apiKey.includes("DummyKey")) {
-                loadLocalReservations();
-                updateSyncBadge('local', '로컬 단독 모드 (GitHub Pages)');
+        // Sync Status Badge Updater
+        function updateSyncStatus(status, text) {
+            // 동기화 상태 표시 안 함
+            return;
+        }
+
+        // Initialize Authentication and Real-time Firestore Sync
+        async function initApp() {
+            loadLocalReservations();
+            renderTimeSlots();
+
+            if (!db || !auth) {
+                updateSyncStatus('local', '로컬 저장소 모드');
                 return;
             }
 
             try {
-                onSnapshot(reservationsRef, (snapshot) => {
-                    isFirebaseReady = true;
-                    reservations = [];
-                    snapshot.forEach((docSnap) => {
-                        reservations.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    localStorage.setItem('cached_science_reservations', JSON.stringify(reservations));
-                    updateSyncBadge('online', '실시간 DB 연동 완료');
-                    renderTimeSlots();
-                    updateAdminStats();
-                    const adminModal = document.getElementById('admin-dashboard-modal');
-                    if (adminModal && !adminModal.classList.contains('hidden')) {
+                let user = null;
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
+                    user = userCredential.user;
+                } else {
+                    const userCredential = await signInAnonymously(auth);
+                    user = userCredential.user;
+                }
+
+                if (user && reservationsRef) {
+                    onSnapshot(reservationsRef, (snapshot) => {
+                        isFirebaseReady = true;
+                        const firebaseData = [];
+                        snapshot.forEach(docSnap => {
+                            firebaseData.push({
+                                id: docSnap.id,
+                                ...docSnap.data()
+                            });
+                        });
+                        reservations = firebaseData;
+                        updateSyncStatus('connected', '실시간 동기화 중');
+                        renderTimeSlots();
+                        updateAdminStats();
                         renderAdminTable();
-                    }
-                }, (error) => {
-                    console.warn("Firestore listener disconnected, falling back to local storage:", error);
-                    isFirebaseReady = false;
-                    loadLocalReservations();
-                    updateSyncBadge('local', '로컬 모드');
-                });
-            } catch(e) {
-                console.warn("Firestore setup failed:", e);
+                    }, (error) => {
+                        console.warn("Firestore snapshot listener error:", error);
+                        isFirebaseReady = false;
+                        updateSyncStatus('local', '로컬 저장소 모드');
+                    });
+                } else {
+                    updateSyncStatus('local', '로컬 저장소 모드');
+                }
+            } catch (err) {
+                console.warn("Firebase Auth/Connect warning:", err);
                 isFirebaseReady = false;
-                loadLocalReservations();
-                updateSyncBadge('local', '로컬 모드');
+                updateSyncStatus('local', '로컬 저장소 모드');
             }
         }
 
-        function loadLocalReservations() {
-            const saved = localStorage.getItem('cached_science_reservations');
-            if (saved) {
-                try {
-                    reservations = JSON.parse(saved);
-                } catch(e) {
-                    reservations = [];
-                }
+        // Session & Sub-group expansion state (hierarchical accordion)
+        let openSessions = { 1: true, 2: false, 3: false };
+        let openSubGroups = {
+            '1-1': true, '1-2': false,
+            '2-1': true, '2-2': false,
+            '3-1': true, '3-2': false
+        };
+
+        const SESSIONS = [
+            { 
+                id: 1, 
+                title: '1부', 
+                start: '10:00', 
+                end: '12:00',
+                subGroups: [
+                    { id: '1-1', title: '10시 시간대', start: '10:00', end: '11:00' },
+                    { id: '1-2', title: '11시 시간대', start: '11:00', end: '12:00' }
+                ]
+            },
+            { 
+                id: 2, 
+                title: '2부', 
+                start: '13:00', 
+                end: '15:00',
+                subGroups: [
+                    { id: '2-1', title: '13시 시간대', start: '13:00', end: '14:00' },
+                    { id: '2-2', title: '14시 시간대', start: '14:00', end: '15:00' }
+                ]
+            },
+            { 
+                id: 3, 
+                title: '3부', 
+                start: '15:00', 
+                end: '17:00',
+                subGroups: [
+                    { id: '3-1', title: '15시 시간대', start: '15:00', end: '16:00' },
+                    { id: '3-2', title: '16시 시간대', start: '16:00', end: '17:00' }
+                ]
             }
-            renderTimeSlots();
-            updateAdminStats();
-        }
+        ];
 
-        function saveLocalReservations() {
-            localStorage.setItem('cached_science_reservations', JSON.stringify(reservations));
-            renderTimeSlots();
-            updateAdminStats();
-            const adminModal = document.getElementById('admin-dashboard-modal');
-            if (adminModal && !adminModal.classList.contains('hidden')) {
-                renderAdminTable();
-            }
-        }
-
-        window.addEventListener('load', async () => {
-            checkDeviceMacAuthorization();
-
-            if (auth && firebaseConfig && !firebaseConfig.apiKey.includes("DummyKey")) {
-                try {
-                    const authPromise = (typeof __initial_auth_token !== 'undefined' && __initial_auth_token)
-                        ? signInWithCustomToken(auth, __initial_auth_token)
-                        : signInAnonymously(auth);
-                    
-                    const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 3000));
-                    await Promise.race([authPromise, authTimeout]);
-                } catch (err) {
-                    console.warn("Firebase auth warning (using local mode):", err);
-                }
-            }
-
-            listenToReservations();
-        });
+        // Master PIN Authorization Code
+        const MASTER_PIN = '6807146';
 
         window.renderTimeSlots = function() {
             const container = document.getElementById('time-slots-container');
             if (!container) return;
-            
             container.innerHTML = '';
 
             SESSIONS.forEach(session => {
-                const sessionTimes = generateTimesForSession(session.start, session.end);
-                
                 const sessionCard = document.createElement('div');
-                sessionCard.className = "bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm";
+                sessionCard.className = "bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden transition-all duration-200";
                 
-                let totalBookedInSession = 0;
-                const totalCapacityInSession = sessionTimes.length * 4;
-                
-                const slotGrid = document.createElement('div');
-                slotGrid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 mt-4";
-                
-                sessionTimes.forEach(time => {
-                    const slotRes = reservations.filter(r => r.day === currentDay && r.time === time);
-                    const bookedCount = slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
-                    totalBookedInSession += bookedCount;
-                    
-                    const remaining = Math.max(0, 4 - bookedCount);
-                    const isFull = remaining === 0;
-                    
-                    const slotBtn = document.createElement('div');
-                    slotBtn.className = `p-3 rounded-xl border transition-all text-center flex flex-col justify-between select-none ${
-                        isFull 
-                            ? 'bg-slate-100 border-slate-200 text-slate-400 opacity-75' 
-                            : remaining <= 2
-                                ? 'bg-amber-50/50 border-amber-200 hover:border-amber-400 cursor-pointer hover:shadow-md'
-                                : 'bg-indigo-50/30 border-indigo-100 hover:border-indigo-400 cursor-pointer hover:shadow-md'
-                    }`;
-                    
-                    if (!isFull) {
-                        slotBtn.onclick = () => openBookingModal(time, remaining);
-                    }
-                    
-                    slotBtn.innerHTML = `
-                        <div class="font-bold text-sm text-slate-800 mb-1 flex items-center justify-center gap-1">
-                            <i class="fa-regular fa-clock text-xs ${isFull ? 'text-slate-400' : 'text-indigo-500'}"></i>
-                            ${time}
+                let sessionBookedCount = 0;
+                let sessionTotalCapacity = 0;
+                const isSessionOpen = !!openSessions[session.id];
+
+                // Calculate total session stats
+                session.subGroups.forEach(sg => {
+                    const sgTimes = generateTimesForSession(sg.start, sg.end);
+                    sessionTotalCapacity += sgTimes.length * 4;
+                    sgTimes.forEach(time => {
+                        const slotRes = reservations.filter(r => r.day === currentDay && r.time === time);
+                        sessionBookedCount += slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+                    });
+                });
+
+                // Container for Sub-groups
+                const subGroupsContainer = document.createElement('div');
+                subGroupsContainer.className = `p-3 sm:p-4 pt-0 border-t border-slate-100 space-y-3 bg-slate-50/50 ${isSessionOpen ? '' : 'hidden'}`;
+
+                session.subGroups.forEach(sg => {
+                    const sgTimes = generateTimesForSession(sg.start, sg.end);
+                    const sgCapacity = sgTimes.length * 4;
+                    let sgBooked = 0;
+
+                    sgTimes.forEach(t => {
+                        const slotRes = reservations.filter(r => r.day === currentDay && r.time === t);
+                        sgBooked += slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+                    });
+
+                    const isSgOpen = !!openSubGroups[sg.id];
+                    const sgCard = document.createElement('div');
+                    sgCard.className = "bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-2xs";
+
+                    // Sub-group Header (Clickable)
+                    const sgHeader = document.createElement('div');
+                    sgHeader.onclick = (e) => toggleSubGroup(sg.id, e);
+                    sgHeader.className = "p-3 flex items-center justify-between cursor-pointer hover:bg-indigo-50/30 transition-colors select-none";
+                    sgHeader.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-regular fa-clock text-indigo-500 text-xs"></i>
+                            <span class="font-bold text-xs sm:text-sm text-slate-800">${sg.title}</span>
+                            <span class="text-[11px] text-slate-400 font-normal">(${sg.start} ~ ${sg.end})</span>
                         </div>
-                        <div class="mt-1">
-                            ${isFull 
-                                ? `<span class="inline-block bg-slate-200 text-slate-600 text-[11px] font-bold px-2 py-0.5 rounded-full">마감 (4/4)</span>` 
-                                : `<span class="inline-block ${remaining <= 2 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'} text-[11px] font-bold px-2 py-0.5 rounded-full">
-                                    신청가능 (${bookedCount}/4)
-                                   </span>`
-                            }
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${sgBooked >= sgCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}">
+                                ${sgBooked} / ${sgCapacity}명
+                            </span>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 ${isSgOpen ? 'rotate-180 text-indigo-600' : ''}"></i>
                         </div>
                     `;
-                    
-                    slotGrid.appendChild(slotBtn);
+
+                    // Sub-group Slot Grid
+                    const slotGrid = document.createElement('div');
+                    slotGrid.className = `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 p-3 bg-white border-t border-slate-100 ${isSgOpen ? '' : 'hidden'}`;
+
+                    sgTimes.forEach(time => {
+                        const slotRes = reservations.filter(r => r.day === currentDay && r.time === time);
+                        const bookedCount = slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+                        const remaining = Math.max(0, 4 - bookedCount);
+                        const isFull = remaining === 0;
+
+                        const slotBtn = document.createElement('div');
+                        slotBtn.className = `p-2.5 rounded-xl border transition-all text-center flex flex-col justify-between select-none ${
+                            isFull 
+                                ? 'bg-slate-100 border-slate-200 text-slate-400 opacity-75' 
+                                : remaining <= 2
+                                    ? 'bg-amber-50/60 border-amber-200 hover:border-amber-400 cursor-pointer hover:shadow-sm'
+                                    : 'bg-indigo-50/40 border-indigo-100 hover:border-indigo-400 cursor-pointer hover:shadow-sm'
+                        }`;
+
+                        if (!isFull) {
+                            slotBtn.onclick = () => openBookingModal(time, remaining);
+                        }
+
+                        slotBtn.innerHTML = `
+                            <div class="font-bold text-xs sm:text-sm text-slate-800 mb-1 flex items-center justify-center gap-1">
+                                ${time}
+                            </div>
+                            <div>
+                                ${isFull 
+                                    ? `<span class="inline-block bg-slate-200 text-slate-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">마감 (4/4)</span>` 
+                                    : `<span class="inline-block ${remaining <= 2 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'} text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                        신청 가능 (${bookedCount}/4)
+                                       </span>`
+                                }
+                            </div>
+                        `;
+
+                        slotGrid.appendChild(slotBtn);
+                    });
+
+                    sgCard.appendChild(sgHeader);
+                    sgCard.appendChild(slotGrid);
+                    subGroupsContainer.appendChild(sgCard);
                 });
-                
+
+                // Top Session Card Header
                 sessionCard.innerHTML = `
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                    <div onclick="toggleSession(${session.id})" class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50/80 transition-colors select-none">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl ${isSessionOpen ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-600'} flex items-center justify-center font-bold text-sm transition-colors">
                                 ${session.id}
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-800 text-sm sm:text-base">${session.title} (${session.start} ~ ${session.end})</h3>
-                                <p class="text-xs text-slate-500">${sessionTimes.length}개 회차 / 총 ${totalCapacityInSession}명 정원</p>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                                    <span>${session.title}</span>
+                                    <span class="text-xs font-normal text-slate-500">(${session.start} ~ ${session.end})</span>
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">${session.subGroups.length}개 시간대 그룹 / 총 ${sessionTotalCapacity}명 정원</p>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${totalBookedInSession >= totalCapacityInSession ? 'bg-red-100 text-red-700' : 'bg-indigo-50 text-indigo-700'}">
-                                예약: ${totalBookedInSession} / ${totalCapacityInSession}명
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${sessionBookedCount >= sessionTotalCapacity ? 'bg-red-100 text-red-700' : 'bg-indigo-50 text-indigo-700'}">
+                                예약: ${sessionBookedCount} / ${sessionTotalCapacity}명
                             </span>
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs transition-transform duration-200 ${isSessionOpen ? 'rotate-180 bg-indigo-50 text-indigo-600' : ''}">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </div>
                     </div>
                 `;
-                
-                sessionCard.appendChild(slotGrid);
+
+                sessionCard.appendChild(subGroupsContainer);
                 container.appendChild(sessionCard);
             });
+        };
+
+        window.toggleSession = function(sessionId) {
+            openSessions[sessionId] = !openSessions[sessionId];
+            renderTimeSlots();
+        };
+
+        window.toggleSubGroup = function(subGroupId, event) {
+            if (event) event.stopPropagation();
+            openSubGroups[subGroupId] = !openSubGroups[subGroupId];
+            renderTimeSlots();
         };
 
         window.switchDay = function(day) {
@@ -592,11 +661,11 @@
             const tabSat = document.getElementById('tab-sat');
             
             if (day === 'fri') {
-                tabFri.className = "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm";
-                tabSat.className = "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
+                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5";
             } else {
-                tabSat.className = "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm";
-                tabFri.className = "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
+                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5";
             }
             
             renderTimeSlots();
@@ -654,7 +723,7 @@
             const currentReservations = reservations.filter(r => r.day === selectedSlot.day && r.time === selectedSlot.time);
             const booked = currentReservations.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
             if (booked + count > 4) {
-                showToast("선택하신 시간대의 남은 정원을 초과했습니다. 다시 시도해 주세요.", "error");
+                showToast("선택하신 시간대의 남은 정원을 초과했습니다.", "error");
                 closeBookingModal();
                 return;
             }
@@ -689,15 +758,10 @@
                         createdAt: serverTimestamp()
                     });
 
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Firebase timeout')), 4000)
-                    );
-
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3500));
                     await Promise.race([addPromise, timeoutPromise]);
                     savedToRemote = true;
-                } catch (err) {
-                    console.warn("Firebase save timed out or failed. Saved locally:", err);
-                }
+                } catch (err) {}
             }
 
             if (!savedToRemote) {
@@ -724,6 +788,7 @@
             document.getElementById('ticket-modal').classList.add('hidden');
         };
 
+        // Hidden Triggers: 5 clicks on logo or Ctrl+Shift+A
         let logoClickCount = 0;
         let logoClickTimer = null;
         window.handleLogoClick = function() {
@@ -744,59 +809,40 @@
             }
         });
 
-        function checkDeviceMacAuthorization() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const rawParam = urlParams.get('mac') || urlParams.get('device') || urlParams.get('ip');
-            const cleanParam = rawParam ? rawParam.toUpperCase().replace(/[:\.-]/g, '') : '';
-            
-            const isParamAuthorized = AUTHORIZED_IDENTIFIERS.includes(cleanParam);
-            const storedAuth = localStorage.getItem('authorized_mac_device') || sessionStorage.getItem('authorized_mac_device');
-
-            if (isParamAuthorized || storedAuth === 'true') {
-                enableAdminButton();
-            }
-        }
-
-        function enableAdminButton() {
-            localStorage.setItem('authorized_mac_device', 'true');
-            sessionStorage.setItem('authorized_mac_device', 'true');
-            const adminBtn = document.getElementById('admin-btn');
-            if (adminBtn) {
-                adminBtn.classList.remove('hidden');
-                adminBtn.classList.add('flex');
-            }
-        }
-
         window.openAdminAuthModal = function() {
             document.getElementById('admin-auth-modal').classList.remove('hidden');
-            const macInput = document.getElementById('admin-mac-address');
-            if (macInput) macInput.focus();
+            const pinInput = document.getElementById('admin-pin-input');
+            if (pinInput) pinInput.focus();
         };
 
         window.closeAdminAuthModal = function() {
             document.getElementById('admin-auth-modal').classList.add('hidden');
-            document.getElementById('admin-mac-address').value = '';
+            document.getElementById('admin-pin-input').value = '';
             document.getElementById('auth-error-msg').classList.add('hidden');
         };
 
         window.handleAdminAuth = function(e) {
             e.preventDefault();
-            const inputVal = document.getElementById('admin-mac-address').value.trim().toUpperCase().replace(/[:\.-]/g, '');
+            const inputVal = document.getElementById('admin-pin-input').value.trim();
 
-            if (AUTHORIZED_IDENTIFIERS.includes(inputVal)) {
+            if (inputVal === MASTER_PIN) {
                 enableAdminButton();
                 closeAdminAuthModal();
                 openAdminDashboard();
-                showToast("인가된 컴퓨터(DESKTOP-DMEHFG7)가 확인되어 관리자 모드가 활성화되었습니다.", "success");
+                showToast("관리자 권한이 승인되었습니다.", "success");
             } else {
                 document.getElementById('auth-error-msg').classList.remove('hidden');
             }
         };
 
         window.openAdminDashboard = function() {
-            renderAdminTable();
-            updateAdminStats();
-            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+            if (localStorage.getItem('admin_authorized') === 'true') {
+                renderAdminTable();
+                updateAdminStats();
+                document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+            } else {
+                openAdminAuthModal();
+            }
         };
 
         window.closeAdminDashboard = function() {
@@ -887,10 +933,9 @@
                 }
                 showToast("예약이 삭제되었습니다.", "success");
             } catch (err) {
-                console.error("Delete error:", err);
                 reservations = reservations.filter(r => r.id !== docId);
                 saveLocalReservations();
-                showToast("로컬에서 예약이 삭제되었습니다.", "success");
+                showToast("삭제 완료되었습니다.", "success");
             }
         };
 
@@ -927,14 +972,11 @@
             showToast("CSV 파일이 다운로드되었습니다.", "success");
         };
 
-        // Firebase Custom Config Modals for GitHub Pages
         window.openFirebaseConfigModal = function() {
             const modal = document.getElementById('firebase-config-modal');
             const textarea = document.getElementById('firebase-config-json');
             const existing = localStorage.getItem('custom_firebase_config');
-            if (existing && textarea) {
-                textarea.value = existing;
-            }
+            if (existing && textarea) textarea.value = existing;
             if (modal) modal.classList.remove('hidden');
         };
 
@@ -949,25 +991,26 @@
             try {
                 const parsed = JSON.parse(val);
                 if (!parsed.apiKey || !parsed.projectId) {
-                    showToast("유효한 Firebase Config (apiKey, projectId)가 필요합니다.", "error");
+                    showToast("유효한 Firebase Config가 필요합니다.", "error");
                     return;
                 }
                 localStorage.setItem('custom_firebase_config', JSON.stringify(parsed));
-                showToast("Firebase 설정이 저장되었습니다. 연결을 재시도합니다.", "success");
-                setTimeout(() => location.reload(), 1200);
+                showToast("Firebase 설정이 저장되었습니다.", "success");
+                setTimeout(() => location.reload(), 1000);
             } catch(err) {
-                showToast("올바른 JSON 형식이 아닙니다. 다시 확인해 주세요.", "error");
+                showToast("올바른 JSON 형식이 아닙니다.", "error");
             }
         };
 
         window.clearFirebaseConfig = function() {
             localStorage.removeItem('custom_firebase_config');
             showToast("Firebase 설정이 초기화되었습니다.", "info");
-            setTimeout(() => location.reload(), 1200);
+            setTimeout(() => location.reload(), 1000);
         };
 
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
+            if (!container) return;
             const toast = document.createElement('div');
             
             let bg = "bg-slate-800 text-white";
@@ -988,7 +1031,9 @@
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
+        // Start Application
+        initApp();
     </script>
 </body>
 </html>
-
