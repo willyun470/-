@@ -49,7 +49,10 @@
                 <div>
                     <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-1.5 flex-wrap">
                         인천중산중 부스 예약 시스템
-                        <span class="bg-indigo-500/60 text-[10px] sm:text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-400/30">v1.3</span>
+                        <button onclick="event.stopPropagation(); openPatchNotesModal();" title="패치노트 확인" class="bg-indigo-500/80 hover:bg-indigo-400 text-[10px] sm:text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-300/30 transition-colors flex items-center gap-1 cursor-pointer">
+                            <span>v1.4</span>
+                            <i class="fa-solid fa-clock-rotate-left text-[9px]"></i>
+                        </button>
                     </h1>
                     <p class="text-[11px] sm:text-xs text-indigo-200">2026 과학대제전 체험부스 실시간 예약</p>
                 </div>
@@ -113,8 +116,111 @@
     <!-- Footer -->
     <footer class="py-5 text-center text-xs text-slate-400 border-t border-slate-200/60 mt-8 bg-white">
         <p class="font-medium text-slate-500">인천중산중학교 과학대제전 체험부스 실시간 예약 시스템</p>
-        <p class="mt-1 text-[11px] text-slate-400">© 2026 Incheon Jungsan Middle School Science Club. All rights reserved.</p>
+        <div class="flex items-center justify-center gap-2 mt-1">
+            <p class="text-[11px] text-slate-400">© 2026 Incheon Jungsan Middle School Science Club.</p>
+            <button onclick="openPatchNotesModal()" class="text-[11px] text-indigo-500 hover:underline font-semibold">패치노트 히스토리</button>
+        </div>
     </footer>
+
+    <!-- Patch Notes History Modal -->
+    <div id="patchnotes-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-100 animate-fade-in relative max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">시스템 패치노트 히스토리</h3>
+                        <p class="text-[11px] text-slate-400">v1.0부터 v1.4까지의 업데이트 역사</p>
+                    </div>
+                </div>
+                <button onclick="closePatchNotesModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Timeline Content -->
+            <div class="overflow-y-auto my-4 pr-1 space-y-4 text-xs flex-grow">
+                
+                <!-- v1.4 -->
+                <div class="border-l-2 border-indigo-500 pl-3.5 relative space-y-1">
+                    <div class="w-3 h-3 bg-indigo-500 rounded-full absolute -left-[7px] top-0.5 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 text-sm">v1.4</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">현재 버전</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>🔥 Firestore 실시간 연동:</strong> 예약 데이터 실시간 클라우드 자동 동기화</li>
+                        <li><strong>🟢 연동 상태 배지:</strong> 상단 헤더에 실시간 DB 연동 상태 배지 표시</li>
+                        <li><strong>🔐 보안 접속 체계:</strong> 관리자 전용 PIN 인증 체계 구축 및 모드 제어 기능</li>
+                        <li><strong>🛠️ 마크다운 정제:</strong> GitHub Pages Jekyll 간섭 예방 및 코드 안정화</li>
+                    </ul>
+                </div>
+
+                <!-- v1.3 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.3</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.08</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>📂 세부 아코디언 UI:</strong> 시간대별 그룹(10시/11시 등) 접기/펴기 카드 도입</li>
+                        <li><strong>👥 인원 연산 로직:</strong> 동반 인원 신청 시 잔여 정원 실시간 초과 검증</li>
+                    </ul>
+                </div>
+
+                <!-- v1.2 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.2</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.07</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>📊 관리자 대시보드:</strong> 일자별/전체 총 예약자 실시간 통계 산출</li>
+                        <li><strong>📥 CSV 추출:</strong> 예약 명단 엑셀 CSV 파일 다운로드 기능</li>
+                        <li><strong>🔍 예약 관리:</strong> 예약자 검색 및 실시간 예약 취소/삭제</li>
+                    </ul>
+                </div>
+
+                <!-- v1.1 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.1</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.06</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>🎫 전자 티켓 발급:</strong> 예약 신청 완료 시 전용 티켓 번호 모달 표시</li>
+                        <li><strong>🚫 마감 자동 처리:</strong> 정원(4명) 초과 시 선택 불가 처리</li>
+                    </ul>
+                </div>
+
+                <!-- v1.0 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.0</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.05</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>🏛️ 예약 시스템 최초 릴리즈:</strong> 금/토 1~3부 10분 타임 운영 스펙 구현</li>
+                        <li><strong>📱 반응형 UI:</strong> 스마트폰 및 PC 환경 최적화 설계</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex-shrink-0">
+                <button onclick="closePatchNotesModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">
+                    확인 및 닫기
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Booking Input Modal -->
     <div id="booking-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -503,38 +609,40 @@
                     db = getFirestore(app);
                     reservationsRef = collection(db, 'science_reservations');
 
-                    let user = null;
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        const userCredential = await signInWithCustomToken(auth, __initial_auth_token);
-                        user = userCredential.user;
-                    } else {
-                        const userCredential = await signInAnonymously(auth);
-                        user = userCredential.user;
+                    // Try anonymous sign-in
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (authErr) {
+                        console.warn("Firebase Auth Notice (Anonymous sign-in skipped or failed):", authErr);
                     }
 
-                    if (user && reservationsRef) {
-                        onSnapshot(reservationsRef, (snapshot) => {
-                            isFirebaseReady = true;
-                            const firebaseData = [];
-                            snapshot.forEach(docSnap => {
-                                firebaseData.push({
-                                    id: docSnap.id,
-                                    ...docSnap.data()
-                                });
+                    // Subscribe to real-time Firestore updates
+                    onSnapshot(reservationsRef, (snapshot) => {
+                        isFirebaseReady = true;
+                        const firebaseData = [];
+                        snapshot.forEach(docSnap => {
+                            firebaseData.push({
+                                id: docSnap.id,
+                                ...docSnap.data()
                             });
-                            reservations = firebaseData;
-                            updateSyncStatus('connected', '실시간 동기화 중');
-                            renderTimeSlots();
-                            updateAdminStats();
-                            renderAdminTable();
-                        }, (error) => {
-                            console.warn("Firestore snapshot error:", error);
-                            isFirebaseReady = false;
-                            updateSyncStatus('local', '로컬 저장소 모드');
                         });
-                    }
+                        reservations = firebaseData;
+                        updateSyncStatus('connected', '실시간 동기화 중');
+                        renderTimeSlots();
+                        updateAdminStats();
+                        renderAdminTable();
+                    }, (error) => {
+                        console.error("Firestore error (Check Firebase Console Security Rules & Database):", error);
+                        isFirebaseReady = false;
+                        updateSyncStatus('local', '로컬 저장소 모드 (Firebase 권한 확인)');
+                    });
+
                 } catch (err) {
-                    console.warn("Firebase Init Error:", err);
+                    console.error("Firebase Initialization Error:", err);
                     isFirebaseReady = false;
                     updateSyncStatus('local', '로컬 저장소 모드');
                 }
@@ -550,6 +658,14 @@
                 adminBtn.classList.add('flex');
             }
         }
+
+        window.openPatchNotesModal = function() {
+            document.getElementById('patchnotes-modal').classList.remove('hidden');
+        };
+
+        window.closePatchNotesModal = function() {
+            document.getElementById('patchnotes-modal').classList.add('hidden');
+        };
 
         window.renderTimeSlots = function() {
             const container = document.getElementById('time-slots-container');
@@ -819,7 +935,6 @@
 
         // Click Logo 5 times to open PIN input modal directly
         window.handleLogoClick = function() {
-            // If already authenticated during this session, directly open dashboard
             if (sessionStorage.getItem('admin_authenticated') === 'true') {
                 openAdminDashboard();
                 return;
@@ -833,7 +948,6 @@
 
             if (logoClickCount >= 5) {
                 logoClickCount = 0;
-                // Pop up PIN Auth Modal FIRST
                 document.getElementById('admin-auth-modal').classList.remove('hidden');
                 document.getElementById('admin-pin-input').value = '';
                 document.getElementById('auth-error-msg').classList.add('hidden');
@@ -866,16 +980,13 @@
             if (pin === MASTER_PIN) {
                 sessionStorage.setItem('admin_authenticated', 'true');
                 closeAdminAuthModal();
-                
-                // Show Admin Button in Header AFTER PIN IS CORRECT
                 showAdminButton();
 
-                // Open Admin Dashboard directly
                 document.getElementById('admin-dashboard-modal').classList.remove('hidden');
                 updateAdminStats();
                 renderAdminTable();
 
-                showToast("관리자 인증에 성공했습니다. [관리자 모드] 버튼이 활성화되었습니다.", "success");
+                showToast("관리자 인증에 성공했습니다.", "success");
             } else {
                 document.getElementById('auth-error-msg').classList.remove('hidden');
             }
