@@ -44,11 +44,19 @@
                 </div>
             </div>
             
-            <!-- Admin button: Secretly visible only on authorized devices -->
-            <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0">
-                <i class="fa-solid fa-user-shield text-xs"></i>
-                <span>관리자 모드</span>
-            </button>
+            <!-- Real-time Sync Status Badge -->
+            <div class="flex items-center gap-2">
+                <div id="sync-status-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/30">
+                    <i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
+                    <span>연동 확인 중...</span>
+                </div>
+
+                <!-- Admin button: Secretly visible only on authorized devices -->
+                <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0">
+                    <i class="fa-solid fa-user-shield text-xs"></i>
+                    <span>관리자 모드</span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -412,8 +420,18 @@
 
         // Sync Status Badge Updater
         function updateSyncStatus(status, text) {
-            // 동기화 상태 표시 안 함
-            return;
+            const badge = document.getElementById('sync-status-badge');
+            if (!badge) return;
+
+            badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium transition-all ";
+
+            if (status === 'connected') {
+                badge.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border', 'border-emerald-400/30');
+                badge.innerHTML = `<i class="fa-solid fa-wifi text-[10px] text-emerald-300"></i><span>${text || '실시간 연동 중'}</span>`;
+            } else {
+                badge.classList.add('bg-amber-500/20', 'text-amber-200', 'border', 'border-amber-400/30');
+                badge.innerHTML = `<i class="fa-solid fa-hard-drive text-[10px] text-amber-300"></i><span>${text || '기기 단독 저장 모드'}</span>`;
+            }
         }
 
         // Initialize Authentication and Real-time Firestore Sync
