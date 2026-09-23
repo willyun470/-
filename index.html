@@ -43,7 +43,7 @@
     <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center gap-2">
             <div class="flex items-center space-x-3 select-none">
-                <!-- Logo Button (5 Clicks Trigger) -->
+                <!-- Secret Admin Trigger: Logo Button (5 Clicks) -->
                 <div onclick="handleLogoClick()" title="5회 연속 클릭 시 관리자 모드" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0 cursor-pointer hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fa-solid fa-flask-vial text-xl text-indigo-200"></i>
                 </div>
@@ -59,18 +59,12 @@
                 </div>
             </div>
             
-            <!-- Real-time Sync Status Badge & Direct Admin Button -->
+            <!-- Real-time Sync Status Badge -->
             <div class="flex items-center gap-2">
                 <div id="sync-status-badge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/30">
                     <i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
                     <span>연동 확인 중...</span>
                 </div>
-
-                <!-- Admin Button Always Visible -->
-                <button id="admin-btn" onclick="openAdminDashboard()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-3 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 cursor-pointer flex">
-                    <i class="fa-solid fa-user-shield text-xs"></i>
-                    <span>관리자</span>
-                </button>
             </div>
         </div>
     </header>
@@ -154,7 +148,7 @@
                     </div>
                     <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
                         <li><strong>⚡ 예약 및 클릭 반응성 최적화:</strong> 네트워크 지연 시 3초 타임아웃 적용 및 로컬 저장소 즉시 백업 처리</li>
-                        <li><strong>🛡️ 관리자 버튼 상시 배치:</strong> 5회 숨김 클릭 대신 상단 관리자 버튼 직접 제공</li>
+                        <li><strong>🔒 관리자 진입 히든키 적용:</strong> 플라스크 로고 5회 클릭 시 인증 창 진입</li>
                     </ul>
                 </div>
 
