@@ -1,7 +1,8 @@
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>과학대제전 체험부스 실시간 예약 시스템</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,85 +14,217 @@
         body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             background-color: #f8fafc;
+            min-height: 100vh;
+            min-height: 100dvh;
         }
         .animate-fade-in {
-            animation: fadeIn 0.25s ease-out forwards;
+            animation: fadeIn 0.2s ease-out forwards;
         }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 9999px;
+        }
     </style>
 </head>
-<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col">
+<body class="text-slate-800 bg-slate-50 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
 
-    <!-- Navigation Bar -->
-    <header class="bg-indigo-600 text-white shadow-lg sticky top-0 z-30">
+    <!-- Header / Navigation Bar -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()" title="기기 MAC 인증 (5회 연속 클릭)">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20">
-                    <i class="fa-solid font-bold fa-flask-vial text-xl text-indigo-200"></i>
+            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()">
+                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0">
+                    <i class="fa-solid fa-flask-vial text-xl text-indigo-200"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
-                        과학대제전 체험부스
-                        <span class="bg-indigo-500/60 text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-400/30">실시간 예약</span>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-1.5 flex-wrap">
+                        인천중산중 부스 예약 시스템
+                        <button onclick="event.stopPropagation(); openPatchNotesModal();" title="패치노트 확인" class="bg-indigo-500/80 hover:bg-indigo-400 text-[10px] sm:text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-300/30 transition-colors flex items-center gap-1 cursor-pointer">
+                            <span>v1.4</span>
+                            <i class="fa-solid fa-clock-rotate-left text-[9px]"></i>
+                        </button>
                     </h1>
-                    <p class="text-xs text-indigo-200">10분 간격 / 회차당 최대 4명 정원</p>
+                    <p class="text-[11px] sm:text-xs text-indigo-200">2026 과학대제전 체험부스 실시간 예약</p>
                 </div>
             </div>
             
-            <!-- Admin button: Only visible when MAC address is verified -->
-            <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3.5 py-1.5 rounded-lg text-xs font-bold items-center gap-1.5 transition-all shadow-md">
-                <i class="fa-solid fa-user-shield text-xs"></i>
-                <span>관리자 모드</span>
-            </button>
+            <!-- Real-time Sync Status Badge & Admin Button -->
+            <div class="flex items-center gap-2">
+                <div id="sync-status-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/30">
+                    <i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
+                    <span>연동 확인 중...</span>
+                </div>
+
+                <!-- Admin Button: Hidden by Default (Revealed only after correct PIN) -->
+                <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 cursor-pointer">
+                    <i class="fa-solid fa-user-shield text-xs"></i>
+                    <span class="inline">관리자 모드</span>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-5xl mx-auto px-4 py-6 flex-grow w-full">
+    <main class="max-w-5xl mx-auto px-3 sm:px-4 py-5 flex-grow w-full">
         
         <!-- Operating Information Banner -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 mb-6 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 mb-5 shadow-sm border border-slate-200/80 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
             <div class="space-y-1">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
                         <i class="fa-regular fa-clock"></i> 부스 운영 안내
                     </span>
-                    <span id="sync-status-badge" class="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md">
-                        <i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> 연결 확인 중...
-                    </span>
+                    <span class="text-xs text-slate-400">|</span>
+                    <span class="text-xs font-medium text-slate-600">시간당 6개 타임 / 타임당 10분 진행</span>
                 </div>
                 <h2 class="text-base font-bold text-slate-800">예약 시간대를 선택하여 신청해 주세요</h2>
                 <p class="text-xs text-slate-500">각 시간대별 정원은 <strong class="text-indigo-600 font-semibold">최대 4명</strong>이며, 선착순 마감됩니다.</p>
             </div>
-            <div class="flex items-center gap-2 text-xs text-slate-600 bg-slate-100/80 p-2.5 rounded-xl border border-slate-200/60">
-                <i class="fa-solid fa-circle-info text-indigo-500 text-sm flex-shrink-0"></i>
-                <span>예약을 완료하시면 타인이 해당 인원만큼 추가 예약을 할 수 없습니다.</span>
+            <div class="flex items-center gap-2 text-xs text-slate-600 bg-amber-50/80 p-2.5 rounded-xl border border-amber-200/80">
+                <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm flex-shrink-0"></i>
+                <span>예약을 완료하시면 타인을 위한 원활한 진행을 위해 <strong>취소가 제한</strong>됩니다.</span>
             </div>
         </div>
 
         <!-- Day Selection Tabs -->
-        <div class="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1 mb-6 border border-slate-200/60 shadow-inner">
-            <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm">
+        <div class="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1.5 mb-5 border border-slate-200/60 shadow-inner">
+            <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm">
                 <i class="fa-solid fa-calendar-day"></i>
-                <span>1일차 : 금요일</span>
+                <span>금요일 (Day 1)</span>
             </button>
-            <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2">
+            <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5">
                 <i class="fa-solid fa-calendar-day"></i>
-                <span>2일차 : 토요일</span>
+                <span>토요일 (Day 2)</span>
             </button>
         </div>
 
         <!-- Dynamic Time Slots Container -->
-        <div id="time-slots-container" class="space-y-6"></div>
+        <div id="time-slots-container" class="space-y-4"></div>
 
     </main>
 
+    <!-- Footer -->
+    <footer class="py-5 text-center text-xs text-slate-400 border-t border-slate-200/60 mt-8 bg-white">
+        <p class="font-medium text-slate-500">인천중산중학교 과학대제전 체험부스 실시간 예약 시스템</p>
+        <div class="flex items-center justify-center gap-2 mt-1">
+            <p class="text-[11px] text-slate-400">© 2026 Incheon Jungsan Middle School Science Club.</p>
+            <button onclick="openPatchNotesModal()" class="text-[11px] text-indigo-500 hover:underline font-semibold">패치노트 히스토리</button>
+        </div>
+    </footer>
+
+    <!-- Patch Notes History Modal -->
+    <div id="patchnotes-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-slate-100 animate-fade-in relative max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 flex-shrink-0">
+                <div class="flex items-center gap-2">
+                    <div class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-rocket"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">시스템 패치노트 히스토리</h3>
+                        <p class="text-[11px] text-slate-400">v1.0부터 v1.4까지의 업데이트</p>
+                    </div>
+                </div>
+                <button onclick="closePatchNotesModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable Timeline Content -->
+            <div class="overflow-y-auto my-4 pr-1 space-y-4 text-xs flex-grow">
+                
+                <!-- v1.4 -->
+                <div class="border-l-2 border-indigo-500 pl-3.5 relative space-y-1">
+                    <div class="w-3 h-3 bg-indigo-500 rounded-full absolute -left-[7px] top-0.5 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 text-sm">v1.4</span>
+                        <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">현재 버전</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.19</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>Firestore 실시간 연동</strong> 예약 데이터 실시간 클라우드 자동 동기화</li>
+                        <li><strong>연동 상태 배지</strong> 상단 헤더에 실시간 DB 연동 상태 배지 표시</li>
+                        <li><strong>보안 접속 체계</strong> 관리자 전용 PIN 인증 체계 구축 및 모드 제어 기능</li>
+                        <li><strong>마크다운 정제</strong> GitHub Pages Jekyll 간섭 예방 및 코드 안정화</li>
+                    </ul>
+                </div>
+
+                <!-- v1.3 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.3</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.18</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>세부 아코디언 UI</strong> 시간대별 그룹(10시/11시 등) 접기/펴기 카드 도입</li>
+                        <li><strong>인원 연산 로직</strong> 동반 인원 신청 시 잔여 정원 실시간 초과 검증</li>
+                    </ul>
+                </div>
+
+                <!-- v1.2 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.2</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.17</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>관리자 대시보드</strong> 일자별/전체 총 예약자 실시간 통계 산출</li>
+                        <li><strong>CSV 추출</strong> 예약 명단 엑셀 CSV 파일 다운로드 기능</li>
+                        <li><strong>예약 관리</strong> 예약자 검색 및 실시간 예약 취소/삭제</li>
+                    </ul>
+                </div>
+
+                <!-- v1.1 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.1</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.17</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>전자 티켓 발급</strong> 예약 신청 완료 시 전용 티켓 번호 모달 표시</li>
+                        <li><strong>마감 자동 처리</strong> 정원(4명) 초과 시 선택 불가 처리</li>
+                    </ul>
+                </div>
+
+                <!-- v1.0 -->
+                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
+                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800">v1.0</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.17</span>
+                    </div>
+                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
+                        <li><strong>예약 시스템 탄생</strong> 금/토 1~3부 10분 타임 운영 스펙 구현</li>
+                        <li><strong>반응형 UI</strong> 스마트폰 및 PC 환경 최적화 설계</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex-shrink-0">
+                <button onclick="closePatchNotesModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">
+                    확인 및 닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Booking Input Modal -->
     <div id="booking-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-fade-in relative">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-100 animate-fade-in relative max-h-[90vh] overflow-y-auto">
             <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
                 <div>
                     <span class="bg-indigo-100 text-indigo-700 text-[11px] font-bold px-2.5 py-1 rounded-md">예약 신청</span>
@@ -109,25 +242,25 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 mb-1">연락처 / 학번 <span class="text-red-500">*</span></label>
-                    <input type="text" id="guest-phone" required placeholder="010-1234-5678 또는 학번" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">연락처 또는 학번 <span class="text-red-500">*</span></label>
+                    <input type="text" id="guest-phone" required placeholder="010-1234-5678 또는 학번(예: 20301)" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">예약 인원 <span class="text-red-500">*</span></label>
-                    <select id="guest-count" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
-                        <option value="1">1명</option>
+                    <select id="guest-count" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white">
+                        <option value="1">1명 (개인)</option>
                     </select>
                 </div>
 
                 <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-[11px] text-amber-800 flex gap-2">
                     <i class="fa-solid fa-triangle-exclamation text-amber-600 text-sm flex-shrink-0 mt-0.5"></i>
                     <div>
-                        <strong>주의:</strong> 예약 후 노쇼 방지를 위해 지정된 시간에 부스를 꼭 방문해 주세요.
+                        <strong>주의:</strong> 정시 입장을 원칙으로 합니다. 예약 시간 2분 전까지 부스 앞으로 와주세요.
                     </div>
                 </div>
 
-                <div class="flex gap-2 pt-2">
+                <div class="flex gap-2 pt-1">
                     <button type="button" onclick="closeBookingModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
                     <button type="submit" id="submit-booking-btn" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">예약 완료하기</button>
                 </div>
@@ -138,14 +271,14 @@
     <!-- Ticket / Confirmation Modal -->
     <div id="ticket-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-fade-in text-center relative overflow-hidden">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl shadow-sm">
                 <i class="fa-solid fa-circle-check"></i>
             </div>
             <h3 class="text-xl font-bold text-slate-800 mb-1">예약이 완료되었습니다!</h3>
-            <p class="text-xs text-slate-500 mb-5">부스 방문 시 아래 예약 정보를 보여주세요.</p>
+            <p class="text-xs text-slate-500 mb-4">부스 방문 시 아래 예약 정보를 진행요원에게 보여주세요.</p>
 
-            <div class="bg-indigo-50/70 rounded-2xl p-4 text-left border border-indigo-100 mb-5 space-y-2 text-xs">
-                <div class="flex justify-between border-b border-indigo-100/60 pb-2">
+            <div class="bg-indigo-50/80 rounded-2xl p-4 text-left border border-indigo-100 mb-5 space-y-2 text-xs">
+                <div class="flex justify-between border-b border-indigo-100/80 pb-2">
                     <span class="text-slate-500">티켓 번호</span>
                     <span id="ticket-code" class="font-mono font-bold text-indigo-700 text-sm">#SCI-0000</span>
                 </div>
@@ -169,32 +302,25 @@
         </div>
     </div>
 
-    <!-- Admin Auth MAC Address Modal -->
+    <!-- Admin Auth Modal (Master PIN Input) -->
     <div id="admin-auth-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
             <div class="text-center mb-4">
-                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl">
-                    <i class="fa-solid fa-laptop-code"></i>
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-2 text-xl shadow-sm">
+                    <i class="fa-solid fa-key"></i>
                 </div>
-                <h3 class="font-bold text-slate-800">관리자 기기(MAC) 인증</h3>
-                <p class="text-xs text-slate-500 mt-0.5">등록된 관리자 컴퓨터의 물리주소를 확인합니다.</p>
+                <h3 class="font-bold text-slate-800">관리자 인증</h3>
+                <p class="text-xs text-slate-500 mt-0.5">마스터 PIN 번호를 입력해 주세요.</p>
             </div>
             <form onsubmit="handleAdminAuth(event)" class="space-y-3">
                 <div>
-                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">인가 대상 물리주소 (MAC Address)</label>
-                    <input type="text" id="admin-mac-address" placeholder="00-FF-B9-2A-83-1C" required autofocus
-                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-xs font-mono text-center tracking-wider focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 uppercase">
+                    <input type="password" id="admin-pin-input" placeholder="PIN 번호 입력" required autofocus autocomplete="off"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm font-mono text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500">
                 </div>
-                <p id="auth-error-msg" class="text-[11px] text-red-500 text-center hidden">허가되지 않은 기기 물리주소(MAC)입니다.</p>
-                <div class="p-2.5 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-500 space-y-1">
-                    <p class="font-semibold text-slate-700 flex items-center gap-1">
-                        <i class="fa-solid fa-circle-info text-indigo-500"></i> 기기 검증 안내
-                    </p>
-                    <p class="text-[10px] leading-relaxed">이 컴퓨터(<code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700 font-bold">DESKTOP-DMEHFG7</code>)의 고유 주소(<code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700 font-bold">0E-81-50-30-FA-43</code> 또는 <code class="bg-slate-200 px-1 py-0.5 rounded text-indigo-700 font-bold">00-FF-B9-2A-83-1C</code>)를 입력하면 이 기기가 등록되어 전용 관리자 모드가 지속적으로 활성화됩니다.</p>
-                </div>
+                <p id="auth-error-msg" class="text-[11px] text-red-500 text-center hidden font-medium">비밀번호(PIN)가 일치하지 않습니다.</p>
                 <div class="flex gap-2 pt-1">
                     <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm">기기 인증 및 입장</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm">인증하기</button>
                 </div>
             </form>
         </div>
@@ -205,65 +331,65 @@
         <div class="bg-white rounded-3xl max-w-4xl w-full h-[90vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden animate-fade-in">
             
             <!-- Admin Header -->
-            <div class="bg-slate-900 text-white px-6 py-4 flex justify-between items-center flex-shrink-0">
+            <div class="bg-slate-900 text-white px-5 sm:px-6 py-3.5 flex justify-between items-center flex-shrink-0">
                 <div class="flex items-center gap-2">
                     <span class="bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-1 rounded-full border border-emerald-500/30 font-semibold">Admin Mode</span>
-                    <h2 class="font-bold text-base">과학대제전 예약관리 모드</h2>
+                    <h2 class="font-bold text-sm sm:text-base">과학대제전 예약관리 모드</h2>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="openFirebaseConfigModal()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
                         <i class="fa-solid fa-database text-indigo-200"></i>
-                        <span>Firebase 연동 설정</span>
+                        <span class="hidden sm:inline">Firebase DB 설정</span>
                     </button>
-                    <button onclick="exportToCSV()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 border border-slate-700 transition-all">
-                        <i class="fa-solid fa-file-csv text-emerald-400"></i>
-                        <span>CSV 다운로드</span>
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span class="hidden sm:inline">CSV 다운로드</span>
                     </button>
-                    <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-800">
+                    <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-800 transition-colors">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Admin Stats Bar -->
-            <div class="bg-slate-100/80 px-6 py-3 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 flex-shrink-0">
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">금요일 총 예약인원</p>
-                    <p id="stat-fri-count" class="text-lg font-bold text-indigo-600">0 / 144 명</p>
+            <div class="bg-slate-100/80 px-4 sm:px-6 py-3 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2.5 flex-shrink-0">
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">금요일 총 예약인원</p>
+                    <p id="stat-fri-count" class="text-base sm:text-lg font-bold text-indigo-600">0 명</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">토요일 총 예약인원</p>
-                    <p id="stat-sat-count" class="text-lg font-bold text-indigo-600">0 / 144 명</p>
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">토요일 총 예약인원</p>
+                    <p id="stat-sat-count" class="text-base sm:text-lg font-bold text-indigo-600">0 명</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">전체 총 예약건수</p>
-                    <p id="stat-total-res" class="text-lg font-bold text-slate-800">0 건</p>
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">전체 총 예약건수</p>
+                    <p id="stat-total-res" class="text-base sm:text-lg font-bold text-slate-800">0 건</p>
                 </div>
-                <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm">
-                    <p class="text-[11px] text-slate-500 font-medium">전체 방문 예정 인원</p>
-                    <p id="stat-total-people" class="text-lg font-bold text-emerald-600">0 명</p>
+                <div class="bg-white p-2.5 sm:p-3 rounded-2xl border border-slate-200/80 shadow-sm">
+                    <p class="text-[10px] sm:text-[11px] text-slate-500 font-medium">전체 방문 예정 인원</p>
+                    <p id="stat-total-people" class="text-base sm:text-lg font-bold text-emerald-600">0 명</p>
                 </div>
             </div>
 
             <!-- Admin Filters & Table -->
-            <div class="p-6 flex-grow flex flex-col overflow-hidden">
-                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mb-4 flex-shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button id="admin-filter-all" onclick="filterAdminData('all')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white">전체</button>
-                        <button id="admin-filter-fri" onclick="filterAdminData('fri')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-600 hover:bg-slate-300">금요일</button>
-                        <button id="admin-filter-sat" onclick="filterAdminData('sat')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-600 hover:bg-slate-300">토요일</button>
+            <div class="p-4 sm:p-6 flex-grow flex flex-col overflow-hidden bg-slate-50/50">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 mb-4 flex-shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <button id="admin-filter-all" onclick="filterAdminData('all')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm">전체 보기</button>
+                        <button id="admin-filter-fri" onclick="filterAdminData('fri')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100">금요일</button>
+                        <button id="admin-filter-sat" onclick="filterAdminData('sat')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100">토요일</button>
                     </div>
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                         <input type="text" id="admin-search-input" oninput="renderAdminTable()" placeholder="이름/연락처/티켓 검색..."
-                            class="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                            class="pl-8 pr-3 py-1.5 rounded-xl border border-slate-200 text-xs w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 bg-white">
                     </div>
                 </div>
 
                 <!-- Table Wrapper -->
-                <div class="flex-grow overflow-auto border border-slate-200 rounded-2xl bg-white">
+                <div class="flex-grow overflow-auto border border-slate-200 rounded-2xl bg-white shadow-sm">
                     <table class="w-full text-left text-xs">
-                        <thead class="bg-slate-50 border-b border-slate-200 sticky top-0 text-slate-500 font-semibold">
+                        <thead class="bg-slate-100/80 border-b border-slate-200 sticky top-0 text-slate-600 font-semibold z-10">
                             <tr>
                                 <th class="p-3">티켓 번호</th>
                                 <th class="p-3">요일 / 시간대</th>
@@ -283,10 +409,10 @@
         </div>
     </div>
 
-    <!-- Custom Toast Alert Container -->
+    <!-- Toast Alert Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Firebase Config Setup Modal for GitHub Pages -->
+    <!-- Firebase Config Setup Modal -->
     <div id="firebase-config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
             <div class="flex items-center justify-between mb-4">
@@ -296,7 +422,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-slate-800">Firebase 실시간 DB 연동 설정</h3>
-                        <p class="text-xs text-slate-500">GitHub Pages에서 여러 기기간 실시간 동기화를 위해 필요합니다.</p>
+                        <p class="text-xs text-slate-500">현재 연결된 Firebase 설정을 변경하거나 재설정할 수 있습니다.</p>
                     </div>
                 </div>
                 <button onclick="closeFirebaseConfigModal()" class="text-slate-400 hover:text-slate-600">
@@ -306,7 +432,7 @@
             <form onsubmit="saveCustomFirebaseConfig(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 mb-1">Firebase Config (JSON 객체)</label>
-                    <textarea id="firebase-config-json" rows="6" required placeholder='{
+                    <textarea id="firebase-config-json" rows="5" required placeholder='{
   "apiKey": "AIzaSy...",
   "authDomain": "your-app.firebaseapp.com",
   "projectId": "your-app",
@@ -316,274 +442,370 @@
 }' class="w-full p-3 rounded-xl border border-slate-200 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/20"></textarea>
                 </div>
                 <div class="text-[11px] text-slate-500 bg-slate-50 p-3 rounded-xl space-y-1">
-                    <p class="font-semibold text-slate-700">💡 설정 팁:</p>
-                    <p>• Firebase Console에서 웹 프로젝트를 추가하고 발급받은 `firebaseConfig` 객체를 붙여넣으세요.</p>
-                    <p>• 미입력 시에는 이 기기 안에서 작동하는 **로컬 저장소 모드**로 안심하고 테스트할 수 있습니다.</p>
+                    <p class="font-semibold text-slate-700">💡 안내:</p>
+                    <p>• 기본 구성이 적용되어 있습니다. 별도로 변경하실 경우에만 수정하세요.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-slate-100 text-red-600 hover:bg-slate-200 rounded-xl font-medium text-xs">설정 초기화</button>
+                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-medium text-xs">기본값 복원</button>
                     <button type="button" onclick="closeFirebaseConfigModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium text-xs">취소</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md">저장 및 다시로드</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md">저장 및 적용</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Firebase & Logic Module -->
+    <!-- Firebase & Application Module Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Check for Custom Stored Firebase Config (GitHub Pages Deployment)
-        const storedConfigStr = localStorage.getItem('custom_firebase_config');
-        let firebaseConfig = null;
+        // Hardcoded Default Firebase Config
+        const DEFAULT_FIREBASE_CONFIG = {
+            apiKey: "AIzaSyDIOiwCkXKSnenikcfhEOl5S5Vp9Wm5luU",
+            authDomain: "rhkwpwjs.firebaseapp.com",
+            projectId: "rhkwpwjs",
+            storageBucket: "rhkwpwjs.firebasestorage.app",
+            messagingSenderId: "563476250207",
+            appId: "1:563476250207:web:32f17974f1daf7b99ce5ea",
+            measurementId: "G-QMZ07WSGTR"
+        };
 
-        if (storedConfigStr) {
-            try {
-                firebaseConfig = JSON.parse(storedConfigStr);
-            } catch(e) {
-                console.error("Invalid custom firebase config", e);
-            }
-        }
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'rhkwpwjs-science-2026';
+        const MASTER_PIN = '6807146';
 
-        if (!firebaseConfig) {
-            firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-                apiKey: "AIzaSyDummyKeyForLocalPreviewExecutionOnly",
-                authDomain: "demo-app.firebaseapp.com",
-                projectId: "demo-app",
-                storageBucket: "demo-app.appspot.com",
-                messagingSenderId: "123456789",
-                appId: "1:123456789:web:abcdef"
-            };
-        }
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'science-fair-2026';
         let app = null, auth = null, db = null, reservationsRef = null;
         let isFirebaseReady = false;
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-            reservationsRef = collection(db, 'artifacts', appId, 'public', 'data', 'science_reservations');
-        } catch(e) {
-            console.warn("Firebase initialization warning:", e);
-        }
-
-        // Application Global State
+        // Global Application State
         let currentDay = 'fri';
         let reservations = [];
         let selectedSlot = null;
         let currentAdminFilter = 'all';
+        let logoClickCount = 0;
+        let logoClickTimer = null;
 
-        // Helper: Update Sync Status Badge
-        function updateSyncBadge(status, text) {
-            const badge = document.getElementById('sync-status-badge');
-            if (!badge) return;
-            if (status === 'online') {
-                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md";
-                badge.innerHTML = `<i class="fa-solid fa-cloud text-emerald-500"></i> ${text || '실시간 DB 연결됨'}`;
-            } else if (status === 'local') {
-                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-md";
-                badge.innerHTML = `<i class="fa-solid fa-hard-drive text-amber-500"></i> ${text || '로컬 모드 (GitHub Pages)'}`;
-            } else {
-                badge.className = "inline-flex items-center gap-1 text-[11px] font-medium text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-md";
-                badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-indigo-500"></i> ${text || '연결 중...'}`;
-            }
-        }
+        // Session & Sub-group Expansion Accordion State
+        let openSessions = { 1: true, 2: false, 3: false };
+        let openSubGroups = {
+            '1-1': true, '1-2': false,
+            '2-1': true, '2-2': false,
+            '3-1': true, '3-2': false
+        };
 
         const SESSIONS = [
-            { id: 1, title: '1부 (오전)', start: '10:00', end: '12:00' },
-            { id: 2, title: '2부 (오후 1차)', start: '13:00', end: '15:00' },
-            { id: 3, title: '3부 (오후 2차)', start: '15:00', end: '17:00' }
+            { 
+                id: 1, 
+                title: '1부', 
+                start: '10:00', 
+                end: '12:00',
+                subGroups: [
+                    { id: '1-1', title: '10시 시간대', start: '10:00', end: '11:00' },
+                    { id: '1-2', title: '11시 시간대', start: '11:00', end: '12:00' }
+                ]
+            },
+            { 
+                id: 2, 
+                title: '2부', 
+                start: '13:00', 
+                end: '15:00',
+                subGroups: [
+                    { id: '2-1', title: '13시 시간대', start: '13:00', end: '14:00' },
+                    { id: '2-2', title: '14시 시간대', start: '14:00', end: '15:00' }
+                ]
+            },
+            { 
+                id: 3, 
+                title: '3부', 
+                start: '15:00', 
+                end: '17:00',
+                subGroups: [
+                    { id: '3-1', title: '15시 시간대', start: '15:00', end: '16:00' },
+                    { id: '3-2', title: '16시 시간대', start: '16:00', end: '17:00' }
+                ]
+            }
         ];
 
-        const AUTHORIZED_IDENTIFIERS = [
-            '00FFB92A831C',
-            '0E815030FA43',
-            '4C496C10A26C',
-            '4E496C10A26B',
-            '4C496C10A26F',
-            '00155D663800',
-            '10.158.136.227'
-        ];
-
-        function generateTimesForSession(startStr, endStr) {
+        // 10-Minute Interval Time Slot Generator
+        function generateTimesForSession(startTime, endTime) {
             const times = [];
-            let [h, m] = startStr.split(':').map(Number);
-            const [endH, endM] = endStr.split(':').map(Number);
+            let [h, m] = startTime.split(':').map(Number);
+            const [endH, endM] = endTime.split(':').map(Number);
+            const endTotal = endH * 60 + endM;
 
-            while (h < endH || (h === endH && m < endM)) {
-                const formattedH = String(h).padStart(2, '0');
-                const formattedM = String(m).padStart(2, '0');
-                times.push(`${formattedH}:${formattedM}`);
+            while (h * 60 + m < endTotal) {
+                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                times.push(timeStr);
                 m += 10;
                 if (m >= 60) {
-                    m = 0;
+                    m -= 60;
                     h += 1;
                 }
             }
             return times;
         }
 
-        function listenToReservations() {
-            if (!db || firebaseConfig.apiKey.includes("DummyKey")) {
-                loadLocalReservations();
-                updateSyncBadge('local', '로컬 단독 모드 (GitHub Pages)');
-                return;
-            }
-
-            try {
-                onSnapshot(reservationsRef, (snapshot) => {
-                    isFirebaseReady = true;
-                    reservations = [];
-                    snapshot.forEach((docSnap) => {
-                        reservations.push({ id: docSnap.id, ...docSnap.data() });
-                    });
-                    localStorage.setItem('cached_science_reservations', JSON.stringify(reservations));
-                    updateSyncBadge('online', '실시간 DB 연동 완료');
-                    renderTimeSlots();
-                    updateAdminStats();
-                    const adminModal = document.getElementById('admin-dashboard-modal');
-                    if (adminModal && !adminModal.classList.contains('hidden')) {
-                        renderAdminTable();
-                    }
-                }, (error) => {
-                    console.warn("Firestore listener disconnected, falling back to local storage:", error);
-                    isFirebaseReady = false;
-                    loadLocalReservations();
-                    updateSyncBadge('local', '로컬 모드');
-                });
-            } catch(e) {
-                console.warn("Firestore setup failed:", e);
-                isFirebaseReady = false;
-                loadLocalReservations();
-                updateSyncBadge('local', '로컬 모드');
-            }
-        }
-
+        // Local Storage Helpers
         function loadLocalReservations() {
-            const saved = localStorage.getItem('cached_science_reservations');
-            if (saved) {
-                try {
-                    reservations = JSON.parse(saved);
-                } catch(e) {
+            try {
+                const stored = localStorage.getItem('science_reservations_' + appId);
+                if (stored) {
+                    reservations = JSON.parse(stored);
+                } else {
                     reservations = [];
                 }
+            } catch(e) {
+                console.error("Local storage load error:", e);
+                reservations = [];
             }
-            renderTimeSlots();
-            updateAdminStats();
         }
 
         function saveLocalReservations() {
-            localStorage.setItem('cached_science_reservations', JSON.stringify(reservations));
-            renderTimeSlots();
-            updateAdminStats();
-            const adminModal = document.getElementById('admin-dashboard-modal');
-            if (adminModal && !adminModal.classList.contains('hidden')) {
-                renderAdminTable();
+            try {
+                localStorage.setItem('science_reservations_' + appId, JSON.stringify(reservations));
+            } catch(e) {
+                console.error("Local storage save error:", e);
             }
         }
 
-        window.addEventListener('load', async () => {
-            checkDeviceMacAuthorization();
+        // Status Badge UI Updater
+        function updateSyncStatus(status, text) {
+            const badge = document.getElementById('sync-status-badge');
+            if (!badge) return;
 
-            if (auth && firebaseConfig && !firebaseConfig.apiKey.includes("DummyKey")) {
-                try {
-                    const authPromise = (typeof __initial_auth_token !== 'undefined' && __initial_auth_token)
-                        ? signInWithCustomToken(auth, __initial_auth_token)
-                        : signInAnonymously(auth);
-                    
-                    const authTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 3000));
-                    await Promise.race([authPromise, authTimeout]);
-                } catch (err) {
-                    console.warn("Firebase auth warning (using local mode):", err);
-                }
+            badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium transition-all ";
+
+            if (status === 'connected') {
+                badge.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border', 'border-emerald-400/30');
+                badge.innerHTML = `<i class="fa-solid fa-wifi text-[10px] text-emerald-300"></i><span>${text || '실시간 연동 중'}</span>`;
+            } else {
+                badge.classList.add('bg-amber-500/20', 'text-amber-200', 'border', 'border-amber-400/30');
+                badge.innerHTML = `<i class="fa-solid fa-hard-drive text-[10px] text-amber-300"></i><span>${text || '기기 단독 저장 모드'}</span>`;
+            }
+        }
+
+        // Initialize Application
+        async function initApp() {
+            loadLocalReservations();
+            renderTimeSlots();
+
+            // If already authenticated during this session, reveal admin button
+            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+                showAdminButton();
             }
 
-            listenToReservations();
-        });
+            // Load Firebase Config from localStorage or Fall back to DEFAULT_FIREBASE_CONFIG
+            let firebaseConfig = DEFAULT_FIREBASE_CONFIG;
+            const storedConfigStr = localStorage.getItem('custom_firebase_config');
+
+            if (storedConfigStr) {
+                try { firebaseConfig = JSON.parse(storedConfigStr); } catch(e) {}
+            }
+
+            if (firebaseConfig && firebaseConfig.apiKey) {
+                try {
+                    app = initializeApp(firebaseConfig);
+                    auth = getAuth(app);
+                    db = getFirestore(app);
+                    reservationsRef = collection(db, 'science_reservations');
+
+                    // Try anonymous sign-in
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (authErr) {
+                        console.warn("Firebase Auth Notice (Anonymous sign-in skipped or failed):", authErr);
+                    }
+
+                    // Subscribe to real-time Firestore updates
+                    onSnapshot(reservationsRef, (snapshot) => {
+                        isFirebaseReady = true;
+                        const firebaseData = [];
+                        snapshot.forEach(docSnap => {
+                            firebaseData.push({
+                                id: docSnap.id,
+                                ...docSnap.data()
+                            });
+                        });
+                        reservations = firebaseData;
+                        updateSyncStatus('connected', '실시간 동기화 중');
+                        renderTimeSlots();
+                        updateAdminStats();
+                        renderAdminTable();
+                    }, (error) => {
+                        console.error("Firestore error (Check Firebase Console Security Rules & Database):", error);
+                        isFirebaseReady = false;
+                        updateSyncStatus('local', '로컬 저장소 모드 (Firebase 권한 확인)');
+                    });
+
+                } catch (err) {
+                    console.error("Firebase Initialization Error:", err);
+                    isFirebaseReady = false;
+                    updateSyncStatus('local', '로컬 저장소 모드');
+                }
+            } else {
+                updateSyncStatus('local', '로컬 저장소 모드');
+            }
+        }
+
+        function showAdminButton() {
+            const adminBtn = document.getElementById('admin-btn');
+            if (adminBtn) {
+                adminBtn.classList.remove('hidden');
+                adminBtn.classList.add('flex');
+            }
+        }
+
+        window.openPatchNotesModal = function() {
+            document.getElementById('patchnotes-modal').classList.remove('hidden');
+        };
+
+        window.closePatchNotesModal = function() {
+            document.getElementById('patchnotes-modal').classList.add('hidden');
+        };
 
         window.renderTimeSlots = function() {
             const container = document.getElementById('time-slots-container');
             if (!container) return;
-            
             container.innerHTML = '';
 
             SESSIONS.forEach(session => {
-                const sessionTimes = generateTimesForSession(session.start, session.end);
-                
                 const sessionCard = document.createElement('div');
-                sessionCard.className = "bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm";
+                sessionCard.className = "bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden transition-all duration-200";
                 
-                let totalBookedInSession = 0;
-                const totalCapacityInSession = sessionTimes.length * 4;
-                
-                const slotGrid = document.createElement('div');
-                slotGrid.className = "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 mt-4";
-                
-                sessionTimes.forEach(time => {
-                    const slotRes = reservations.filter(r => r.day === currentDay && r.time === time);
-                    const bookedCount = slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
-                    totalBookedInSession += bookedCount;
-                    
-                    const remaining = Math.max(0, 4 - bookedCount);
-                    const isFull = remaining === 0;
-                    
-                    const slotBtn = document.createElement('div');
-                    slotBtn.className = `p-3 rounded-xl border transition-all text-center flex flex-col justify-between select-none ${
-                        isFull 
-                            ? 'bg-slate-100 border-slate-200 text-slate-400 opacity-75' 
-                            : remaining <= 2
-                                ? 'bg-amber-50/50 border-amber-200 hover:border-amber-400 cursor-pointer hover:shadow-md'
-                                : 'bg-indigo-50/30 border-indigo-100 hover:border-indigo-400 cursor-pointer hover:shadow-md'
-                    }`;
-                    
-                    if (!isFull) {
-                        slotBtn.onclick = () => openBookingModal(time, remaining);
-                    }
-                    
-                    slotBtn.innerHTML = `
-                        <div class="font-bold text-sm text-slate-800 mb-1 flex items-center justify-center gap-1">
-                            <i class="fa-regular fa-clock text-xs ${isFull ? 'text-slate-400' : 'text-indigo-500'}"></i>
-                            ${time}
+                let sessionBookedCount = 0;
+                let sessionTotalCapacity = 0;
+                const isSessionOpen = !!openSessions[session.id];
+
+                session.subGroups.forEach(sg => {
+                    const sgTimes = generateTimesForSession(sg.start, sg.end);
+                    sessionTotalCapacity += sgTimes.length * 4;
+                    sgTimes.forEach(time => {
+                        const slotRes = reservations.filter(r => r.day === currentDay && r.time === time);
+                        sessionBookedCount += slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+                    });
+                });
+
+                const subGroupsContainer = document.createElement('div');
+                subGroupsContainer.className = `p-3 sm:p-4 pt-0 border-t border-slate-100 space-y-3 bg-slate-50/50 ${isSessionOpen ? '' : 'hidden'}`;
+
+                session.subGroups.forEach(sg => {
+                    const sgTimes = generateTimesForSession(sg.start, sg.end);
+                    const sgCapacity = sgTimes.length * 4;
+                    let sgBooked = 0;
+
+                    sgTimes.forEach(t => {
+                        const slotRes = reservations.filter(r => r.day === currentDay && r.time === t);
+                        sgBooked += slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+                    });
+
+                    const isSgOpen = !!openSubGroups[sg.id];
+                    const sgCard = document.createElement('div');
+                    sgCard.className = "bg-white rounded-xl border border-slate-200/90 overflow-hidden shadow-2xs";
+
+                    const sgHeader = document.createElement('div');
+                    sgHeader.onclick = (e) => toggleSubGroup(sg.id, e);
+                    sgHeader.className = "p-3 flex items-center justify-between cursor-pointer hover:bg-indigo-50/30 transition-colors select-none";
+                    sgHeader.innerHTML = `
+                        <div class="flex items-center gap-2.5">
+                            <i class="fa-regular fa-clock text-indigo-500 text-xs"></i>
+                            <span class="font-bold text-xs sm:text-sm text-slate-800">${sg.title}</span>
+                            <span class="text-[11px] text-slate-400 font-normal">(${sg.start} ~ ${sg.end})</span>
                         </div>
-                        <div class="mt-1">
-                            ${isFull 
-                                ? `<span class="inline-block bg-slate-200 text-slate-600 text-[11px] font-bold px-2 py-0.5 rounded-full">마감 (4/4)</span>` 
-                                : `<span class="inline-block ${remaining <= 2 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'} text-[11px] font-bold px-2 py-0.5 rounded-full">
-                                    신청가능 (${bookedCount}/4)
-                                   </span>`
-                            }
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-md ${sgBooked >= sgCapacity ? 'bg-red-50 text-red-600' : 'bg-slate-100 text-slate-600'}">
+                                ${sgBooked} / ${sgCapacity}명
+                            </span>
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 ${isSgOpen ? 'rotate-180 text-indigo-600' : ''}"></i>
                         </div>
                     `;
-                    
-                    slotGrid.appendChild(slotBtn);
+
+                    const slotGrid = document.createElement('div');
+                    slotGrid.className = `grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 p-3 bg-white border-t border-slate-100 ${isSgOpen ? '' : 'hidden'}`;
+
+                    sgTimes.forEach(time => {
+                        const slotRes = reservations.filter(r => r.day === currentDay && r.time === time);
+                        const bookedCount = slotRes.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+                        const remaining = Math.max(0, 4 - bookedCount);
+                        const isFull = remaining === 0;
+
+                        const slotBtn = document.createElement('div');
+                        slotBtn.className = `p-2.5 rounded-xl border transition-all text-center flex flex-col justify-between select-none ${
+                            isFull 
+                                ? 'bg-slate-100 border-slate-200 text-slate-400 opacity-75' 
+                                : remaining <= 2
+                                    ? 'bg-amber-50/60 border-amber-200 hover:border-amber-400 cursor-pointer hover:shadow-sm'
+                                    : 'bg-indigo-50/40 border-indigo-100 hover:border-indigo-400 cursor-pointer hover:shadow-sm'
+                        }`;
+
+                        if (!isFull) {
+                            slotBtn.onclick = () => openBookingModal(time, remaining);
+                        }
+
+                        slotBtn.innerHTML = `
+                            <div class="font-bold text-xs sm:text-sm text-slate-800 mb-1 flex items-center justify-center gap-1">
+                                ${time}
+                            </div>
+                            <div>
+                                ${isFull 
+                                    ? `<span class="inline-block bg-slate-200 text-slate-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">마감 (4/4)</span>` 
+                                    : `<span class="inline-block ${remaining <= 2 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'} text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                                        신청 가능 (${bookedCount}/4)
+                                       </span>`
+                                }
+                            </div>
+                        `;
+
+                        slotGrid.appendChild(slotBtn);
+                    });
+
+                    sgCard.appendChild(sgHeader);
+                    sgCard.appendChild(slotGrid);
+                    subGroupsContainer.appendChild(sgCard);
                 });
-                
+
                 sessionCard.innerHTML = `
-                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                    <div onclick="toggleSession(${session.id})" class="p-4 sm:p-5 flex items-center justify-between cursor-pointer hover:bg-slate-50/80 transition-colors select-none">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl ${isSessionOpen ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-600'} flex items-center justify-center font-bold text-sm transition-colors">
                                 ${session.id}
                             </div>
                             <div>
-                                <h3 class="font-bold text-slate-800 text-sm sm:text-base">${session.title} (${session.start} ~ ${session.end})</h3>
-                                <p class="text-xs text-slate-500">${sessionTimes.length}개 회차 / 총 ${totalCapacityInSession}명 정원</p>
+                                <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
+                                    <span>${session.title}</span>
+                                    <span class="text-xs font-normal text-slate-500">(${session.start} ~ ${session.end})</span>
+                                </h3>
+                                <p class="text-xs text-slate-500 mt-0.5">${session.subGroups.length}개 시간대 그룹 / 총 ${sessionTotalCapacity}명 정원</p>
                             </div>
                         </div>
-                        <div class="text-right">
-                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${totalBookedInSession >= totalCapacityInSession ? 'bg-red-100 text-red-700' : 'bg-indigo-50 text-indigo-700'}">
-                                예약: ${totalBookedInSession} / ${totalCapacityInSession}명
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-lg ${sessionBookedCount >= sessionTotalCapacity ? 'bg-red-100 text-red-700' : 'bg-indigo-50 text-indigo-700'}">
+                                예약: ${sessionBookedCount} / ${sessionTotalCapacity}명
                             </span>
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-xs transition-transform duration-200 ${isSessionOpen ? 'rotate-180 bg-indigo-50 text-indigo-600' : ''}">
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
                         </div>
                     </div>
                 `;
-                
-                sessionCard.appendChild(slotGrid);
+
+                sessionCard.appendChild(subGroupsContainer);
                 container.appendChild(sessionCard);
             });
+        };
+
+        window.toggleSession = function(sessionId) {
+            openSessions[sessionId] = !openSessions[sessionId];
+            renderTimeSlots();
+        };
+
+        window.toggleSubGroup = function(subGroupId, event) {
+            if (event) event.stopPropagation();
+            openSubGroups[subGroupId] = !openSubGroups[subGroupId];
+            renderTimeSlots();
         };
 
         window.switchDay = function(day) {
@@ -592,11 +814,11 @@
             const tabSat = document.getElementById('tab-sat');
             
             if (day === 'fri') {
-                tabFri.className = "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm";
-                tabSat.className = "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
+                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5";
             } else {
-                tabSat.className = "flex-1 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white text-indigo-600 shadow-sm";
-                tabFri.className = "flex-1 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-2";
+                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5";
             }
             
             renderTimeSlots();
@@ -624,7 +846,7 @@
             for (let i = 1; i <= maxSelectable; i++) {
                 const opt = document.createElement('option');
                 opt.value = i;
-                opt.innerText = `${i}명`;
+                opt.innerText = `${i}명 ${i === 1 ? '(개인)' : `(동반 ${i-1}인)`}`;
                 countSelect.appendChild(opt);
             }
             
@@ -636,6 +858,7 @@
 
         window.closeBookingModal = function() {
             document.getElementById('booking-modal').classList.add('hidden');
+            selectedSlot = null;
         };
 
         window.handleBookingSubmit = async function(e) {
@@ -647,14 +870,14 @@
             const count = parseInt(document.getElementById('guest-count').value, 10);
             
             if (!name || !phone) {
-                showToast("이름과 연락처를 모두 입력해 주세요.", "error");
+                showToast("이름과 연락처(학번)를 입력해 주세요.", "error");
                 return;
             }
             
             const currentReservations = reservations.filter(r => r.day === selectedSlot.day && r.time === selectedSlot.time);
             const booked = currentReservations.reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
             if (booked + count > 4) {
-                showToast("선택하신 시간대의 남은 정원을 초과했습니다. 다시 시도해 주세요.", "error");
+                showToast("선택하신 시간대의 남은 정원을 초과했습니다.", "error");
                 closeBookingModal();
                 return;
             }
@@ -665,7 +888,6 @@
             
             const ticketCode = 'SCI-' + Math.floor(1000 + Math.random() * 9000);
             const newRes = {
-                id: 'res-' + Date.now(),
                 day: selectedSlot.day,
                 time: selectedSlot.time,
                 name: name,
@@ -675,319 +897,304 @@
                 createdAt: new Date().toISOString()
             };
 
-            let savedToRemote = false;
-
-            if (isFirebaseReady && reservationsRef) {
-                try {
-                    const addPromise = addDoc(reservationsRef, {
-                        day: selectedSlot.day,
-                        time: selectedSlot.time,
-                        name: name,
-                        phone: phone,
-                        partySize: count,
-                        ticketCode: ticketCode,
-                        createdAt: serverTimestamp()
-                    });
-
-                    const timeoutPromise = new Promise((_, reject) => 
-                        setTimeout(() => reject(new Error('Firebase timeout')), 4000)
-                    );
-
-                    await Promise.race([addPromise, timeoutPromise]);
-                    savedToRemote = true;
-                } catch (err) {
-                    console.warn("Firebase save timed out or failed. Saved locally:", err);
+            try {
+                if (isFirebaseReady && reservationsRef) {
+                    await addDoc(reservationsRef, newRes);
+                } else {
+                    newRes.id = 'loc-' + Date.now();
+                    reservations.push(newRes);
+                    saveLocalReservations();
+                    renderTimeSlots();
                 }
+
+                closeBookingModal();
+                showTicketModal(newRes);
+                showToast("예약이 성공적으로 완료 되었습니다!", "success");
+            } catch (err) {
+                console.error("Booking submit error:", err);
+                showToast("예약 저장 중 오류가 발생했습니다.", "error");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "예약 완료하기";
             }
-
-            if (!savedToRemote) {
-                reservations.push(newRes);
-                saveLocalReservations();
-            }
-
-            closeBookingModal();
-            
-            const dayKr = selectedSlot.day === 'fri' ? '금요일' : '토요일';
-            document.getElementById('ticket-code').innerText = `#${ticketCode}`;
-            document.getElementById('ticket-datetime').innerText = `${dayKr} ${selectedSlot.time}`;
-            document.getElementById('ticket-name').innerText = name;
-            document.getElementById('ticket-count').innerText = `${count}명`;
-            
-            document.getElementById('ticket-modal').classList.remove('hidden');
-            showToast("예약이 성공적으로 완료되었습니다!", "success");
-
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = `<span>예약 완료하기</span>`;
         };
+
+        function showTicketModal(resData) {
+            const dayKr = resData.day === 'fri' ? '금요일' : '토요일';
+            document.getElementById('ticket-code').innerText = resData.ticketCode;
+            document.getElementById('ticket-datetime').innerText = `${dayKr} ${resData.time}`;
+            document.getElementById('ticket-name').innerText = resData.name;
+            document.getElementById('ticket-count').innerText = `${resData.partySize || 1}명`;
+
+            document.getElementById('ticket-modal').classList.remove('hidden');
+        }
 
         window.closeTicketModal = function() {
             document.getElementById('ticket-modal').classList.add('hidden');
         };
 
-        let logoClickCount = 0;
-        let logoClickTimer = null;
+        // Click Logo 5 times to open PIN input modal directly
         window.handleLogoClick = function() {
+            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+                openAdminDashboard();
+                return;
+            }
+
             logoClickCount++;
             clearTimeout(logoClickTimer);
+            logoClickTimer = setTimeout(() => {
+                logoClickCount = 0;
+            }, 3000);
+
             if (logoClickCount >= 5) {
                 logoClickCount = 0;
-                openAdminAuthModal();
-            } else {
-                logoClickTimer = setTimeout(() => { logoClickCount = 0; }, 2000);
-            }
-        };
-
-        window.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-                e.preventDefault();
-                openAdminAuthModal();
-            }
-        });
-
-        function checkDeviceMacAuthorization() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const rawParam = urlParams.get('mac') || urlParams.get('device') || urlParams.get('ip');
-            const cleanParam = rawParam ? rawParam.toUpperCase().replace(/[:\.-]/g, '') : '';
-            
-            const isParamAuthorized = AUTHORIZED_IDENTIFIERS.includes(cleanParam);
-            const storedAuth = localStorage.getItem('authorized_mac_device') || sessionStorage.getItem('authorized_mac_device');
-
-            if (isParamAuthorized || storedAuth === 'true') {
-                enableAdminButton();
-            }
-        }
-
-        function enableAdminButton() {
-            localStorage.setItem('authorized_mac_device', 'true');
-            sessionStorage.setItem('authorized_mac_device', 'true');
-            const adminBtn = document.getElementById('admin-btn');
-            if (adminBtn) {
-                adminBtn.classList.remove('hidden');
-                adminBtn.classList.add('flex');
-            }
-        }
-
-        window.openAdminAuthModal = function() {
-            document.getElementById('admin-auth-modal').classList.remove('hidden');
-            const macInput = document.getElementById('admin-mac-address');
-            if (macInput) macInput.focus();
-        };
-
-        window.closeAdminAuthModal = function() {
-            document.getElementById('admin-auth-modal').classList.add('hidden');
-            document.getElementById('admin-mac-address').value = '';
-            document.getElementById('auth-error-msg').classList.add('hidden');
-        };
-
-        window.handleAdminAuth = function(e) {
-            e.preventDefault();
-            const inputVal = document.getElementById('admin-mac-address').value.trim().toUpperCase().replace(/[:\.-]/g, '');
-
-            if (AUTHORIZED_IDENTIFIERS.includes(inputVal)) {
-                enableAdminButton();
-                closeAdminAuthModal();
-                openAdminDashboard();
-                showToast("인가된 컴퓨터(DESKTOP-DMEHFG7)가 확인되어 관리자 모드가 활성화되었습니다.", "success");
-            } else {
-                document.getElementById('auth-error-msg').classList.remove('hidden');
+                document.getElementById('admin-auth-modal').classList.remove('hidden');
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('auth-error-msg').classList.add('hidden');
+                setTimeout(() => {
+                    const pinInput = document.getElementById('admin-pin-input');
+                    if (pinInput) pinInput.focus();
+                }, 100);
             }
         };
 
         window.openAdminDashboard = function() {
-            renderAdminTable();
-            updateAdminStats();
-            document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+                document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+                updateAdminStats();
+                renderAdminTable();
+            } else {
+                document.getElementById('admin-auth-modal').classList.remove('hidden');
+                document.getElementById('admin-pin-input').value = '';
+                document.getElementById('auth-error-msg').classList.add('hidden');
+            }
+        };
+
+        window.closeAdminAuthModal = function() {
+            document.getElementById('admin-auth-modal').classList.add('hidden');
+        };
+
+        window.handleAdminAuth = function(e) {
+            e.preventDefault();
+            const pin = document.getElementById('admin-pin-input').value.trim();
+            if (pin === MASTER_PIN) {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                closeAdminAuthModal();
+                showAdminButton();
+
+                document.getElementById('admin-dashboard-modal').classList.remove('hidden');
+                updateAdminStats();
+                renderAdminTable();
+
+                showToast("관리자 인증에 성공했습니다.", "success");
+            } else {
+                document.getElementById('auth-error-msg').classList.remove('hidden');
+            }
         };
 
         window.closeAdminDashboard = function() {
             document.getElementById('admin-dashboard-modal').classList.add('hidden');
         };
 
-        window.filterAdminData = function(filter) {
-            currentAdminFilter = filter;
-            ['all', 'fri', 'sat'].forEach(f => {
-                const btn = document.getElementById(`admin-filter-${f}`);
-                if (btn) {
-                    btn.className = f === filter 
-                        ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white" 
-                        : "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-600 hover:bg-slate-300";
-                }
-            });
+        function updateAdminStats() {
+            const friTotal = reservations.filter(r => r.day === 'fri').reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+            const satTotal = reservations.filter(r => r.day === 'sat').reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
+            const grandTotal = friTotal + satTotal;
+
+            const elFri = document.getElementById('stat-fri-count');
+            const elSat = document.getElementById('stat-sat-count');
+            const elRes = document.getElementById('stat-total-res');
+            const elPeople = document.getElementById('stat-total-people');
+
+            if (elFri) elFri.innerText = `${friTotal} 명`;
+            if (elSat) elSat.innerText = `${satTotal} 명`;
+            if (elRes) elRes.innerText = `${reservations.length} 건`;
+            if (elPeople) elPeople.innerText = `${grandTotal} 명`;
+        }
+
+        window.filterAdminData = function(day) {
+            currentAdminFilter = day;
+            const btnAll = document.getElementById('admin-filter-all');
+            const btnFri = document.getElementById('admin-filter-fri');
+            const btnSat = document.getElementById('admin-filter-sat');
+
+            const activeClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm";
+            const inactiveClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100";
+
+            if (btnAll) btnAll.className = day === 'all' ? activeClass : inactiveClass;
+            if (btnFri) btnFri.className = day === 'fri' ? activeClass : inactiveClass;
+            if (btnSat) btnSat.className = day === 'sat' ? activeClass : inactiveClass;
+
             renderAdminTable();
         };
 
         window.renderAdminTable = function() {
             const tbody = document.getElementById('admin-table-body');
-            const searchInput = document.getElementById('admin-search-input');
-            const searchKeyword = searchInput ? searchInput.value.toLowerCase().trim() : '';
+            const queryInput = document.getElementById('admin-search-input');
+            const query = queryInput ? queryInput.value.toLowerCase().trim() : '';
 
-            tbody.innerHTML = '';
+            if (!tbody) return;
 
-            let filtered = reservations.filter(r => {
-                if (currentAdminFilter !== 'all' && r.day !== currentAdminFilter) return false;
-                if (searchKeyword) {
-                    const nameMatch = r.name?.toLowerCase().includes(searchKeyword);
-                    const phoneMatch = r.phone?.toLowerCase().includes(searchKeyword);
-                    const ticketMatch = r.ticketCode?.toLowerCase().includes(searchKeyword);
-                    return nameMatch || phoneMatch || ticketMatch;
-                }
-                return true;
-            });
+            let filtered = reservations;
 
-            filtered.sort((a, b) => {
-                if (a.day !== b.day) return a.day === 'fri' ? -1 : 1;
-                return (a.time || '').localeCompare(b.time || '');
-            });
+            if (currentAdminFilter !== 'all') {
+                filtered = filtered.filter(r => r.day === currentAdminFilter);
+            }
+
+            if (query) {
+                filtered = filtered.filter(r => 
+                    (r.name && r.name.toLowerCase().includes(query)) ||
+                    (r.phone && r.phone.toLowerCase().includes(query)) ||
+                    (r.ticketCode && r.ticketCode.toLowerCase().includes(query))
+                );
+            }
+
+            filtered.sort((a, b) => (a.time || '').localeCompare(b.time || ''));
 
             if (filtered.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" class="p-8 text-center text-slate-400">
-                            예약 내역이 존재하지 않습니다.
+                            <i class="fa-solid fa-inbox text-3xl mb-2 block text-slate-300"></i>
+                            등록된 예약 내역이 없습니다.
                         </td>
                     </tr>
                 `;
                 return;
             }
 
+            let html = '';
             filtered.forEach(r => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-all";
-                const dayBadge = r.day === 'fri' 
-                    ? `<span class="bg-blue-100 text-blue-700 font-semibold px-2 py-0.5 rounded text-[10px]">금요일</span>`
-                    : `<span class="bg-amber-100 text-amber-700 font-semibold px-2 py-0.5 rounded text-[10px]">토요일</span>`;
-
-                tr.innerHTML = `
-                    <td class="p-3 font-mono font-bold text-indigo-600">#${r.ticketCode || 'N/A'}</td>
-                    <td class="p-3 flex items-center gap-1.5">
-                        ${dayBadge}
-                        <span class="font-bold text-slate-800">${r.time}</span>
-                    </td>
-                    <td class="p-3 font-medium text-slate-800">${r.name}</td>
-                    <td class="p-3 text-slate-600">${r.phone}</td>
-                    <td class="p-3 font-bold text-indigo-600">${r.partySize}명</td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteReservation('${r.id}')" class="text-xs bg-red-50 hover:bg-red-100 text-red-600 px-2.5 py-1 rounded-lg border border-red-200 font-medium transition-all">
-                            취소/삭제
-                        </button>
-                    </td>
+                const dayKr = r.day === 'fri' ? '금요일' : '토요일';
+                html += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="p-3 font-mono font-bold text-indigo-600">${r.ticketCode || '-'}</td>
+                        <td class="p-3 font-medium text-slate-700">${dayKr} ${r.time}</td>
+                        <td class="p-3 font-bold text-slate-800">${r.name}</td>
+                        <td class="p-3 font-mono text-slate-600">${r.phone}</td>
+                        <td class="p-3 font-bold text-slate-700">${r.partySize || 1}명</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteReservation('${r.id}')" class="px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold text-[11px] transition-colors">
+                                취소/삭제
+                            </button>
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
             });
+
+            tbody.innerHTML = html;
         };
 
-        window.deleteReservation = async function(docId) {
-            if (!confirm("정말 이 예약을 취소/삭제하시겠습니까?")) return;
+        window.deleteReservation = async function(id) {
+            if (!confirm("해당 예약을 취소 및 삭제하시겠습니까?")) return;
+
             try {
-                if (isFirebaseReady && db && !docId.startsWith('res-')) {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'science_reservations', docId));
+                if (isFirebaseReady && db && !id.startsWith('loc-')) {
+                    const docRef = doc(db, 'science_reservations', id);
+                    await deleteDoc(docRef);
                 } else {
-                    reservations = reservations.filter(r => r.id !== docId);
+                    reservations = reservations.filter(r => r.id !== id);
                     saveLocalReservations();
+                    renderTimeSlots();
+                    updateAdminStats();
+                    renderAdminTable();
                 }
-                showToast("예약이 삭제되었습니다.", "success");
+                showToast("예약이 취소되었습니다.", "info");
             } catch (err) {
                 console.error("Delete error:", err);
-                reservations = reservations.filter(r => r.id !== docId);
-                saveLocalReservations();
-                showToast("로컬에서 예약이 삭제되었습니다.", "success");
+                showToast("삭제 처리 중 오류가 발생했습니다.", "error");
             }
         };
-
-        function updateAdminStats() {
-            const friPeople = reservations.filter(r => r.day === 'fri').reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
-            const satPeople = reservations.filter(r => r.day === 'sat').reduce((sum, r) => sum + (Number(r.partySize) || 1), 0);
-            const totalPeople = friPeople + satPeople;
-
-            document.getElementById('stat-fri-count').innerText = `${friPeople} / 144 명`;
-            document.getElementById('stat-sat-count').innerText = `${satPeople} / 144 명`;
-            document.getElementById('stat-total-res').innerText = `${reservations.length} 건`;
-            document.getElementById('stat-total-people').innerText = `${totalPeople} 명`;
-        }
 
         window.exportToCSV = function() {
             if (reservations.length === 0) {
-                showToast("다운로드할 데이터가 없습니다.", "error");
+                showToast("다운로드할 예약 내역이 없습니다.", "error");
                 return;
             }
 
-            let csvContent = "\uFEFF티켓번호,요일,시간,예약자명,연락처,인원\n";
+            let csvContent = "\uFEFF티켓번호,요일,시간대,예약자명,연락처,인원,신청일시\n";
+
             reservations.forEach(r => {
                 const dayKr = r.day === 'fri' ? '금요일' : '토요일';
-                csvContent += `"${r.ticketCode || ''}","${dayKr}","${r.time}","${r.name}","${r.phone}","${r.partySize}"\n`;
+                const createdAt = r.createdAt ? new Date(r.createdAt).toLocaleString('ko-KR') : '';
+                csvContent += `"${r.ticketCode || ''}","${dayKr}","${r.time || ''}","${r.name || ''}","${r.phone || ''}","${r.partySize || 1}","${createdAt}"\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `과학대제전_부스예약명단.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast("CSV 파일이 다운로드되었습니다.", "success");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `과학대제전_부스예약명단_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("CSV 명단 파일이 다운로드 되었습니다.", "success");
         };
 
-        // Firebase Custom Config Modals for GitHub Pages
         window.openFirebaseConfigModal = function() {
-            const modal = document.getElementById('firebase-config-modal');
-            const textarea = document.getElementById('firebase-config-json');
-            const existing = localStorage.getItem('custom_firebase_config');
-            if (existing && textarea) {
-                textarea.value = existing;
+            const jsonInput = document.getElementById('firebase-config-json');
+            if (jsonInput && !jsonInput.value) {
+                jsonInput.value = JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
             }
-            if (modal) modal.classList.remove('hidden');
+            document.getElementById('firebase-config-modal').classList.remove('hidden');
         };
 
         window.closeFirebaseConfigModal = function() {
-            const modal = document.getElementById('firebase-config-modal');
-            if (modal) modal.classList.add('hidden');
+            document.getElementById('firebase-config-modal').classList.add('hidden');
         };
 
         window.saveCustomFirebaseConfig = function(e) {
             e.preventDefault();
-            const val = document.getElementById('firebase-config-json').value.trim();
+            const jsonText = document.getElementById('firebase-config-json').value.trim();
             try {
-                const parsed = JSON.parse(val);
-                if (!parsed.apiKey || !parsed.projectId) {
-                    showToast("유효한 Firebase Config (apiKey, projectId)가 필요합니다.", "error");
-                    return;
-                }
-                localStorage.setItem('custom_firebase_config', JSON.stringify(parsed));
-                showToast("Firebase 설정이 저장되었습니다. 연결을 재시도합니다.", "success");
-                setTimeout(() => location.reload(), 1200);
+                JSON.parse(jsonText);
+                localStorage.setItem('custom_firebase_config', jsonText);
+                showToast("Firebase Config가 저장되었습니다. 새로고침합니다.", "success");
+                setTimeout(() => window.location.reload(), 800);
             } catch(err) {
-                showToast("올바른 JSON 형식이 아닙니다. 다시 확인해 주세요.", "error");
+                showToast("올바른 JSON 형식이 아닙니다.", "error");
             }
         };
 
         window.clearFirebaseConfig = function() {
             localStorage.removeItem('custom_firebase_config');
-            showToast("Firebase 설정이 초기화되었습니다.", "info");
-            setTimeout(() => location.reload(), 1200);
+            showToast("Firebase 설정이 기본값으로 복원되었습니다. 새로고침합니다.", "info");
+            setTimeout(() => window.location.reload(), 800);
         };
 
-        function showToast(message, type = 'info') {
+        // Utility: Toast Alert
+        function showToast(message, type = "info") {
             const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let bg = "bg-slate-800 text-white";
-            if (type === 'success') bg = "bg-emerald-600 text-white";
-            if (type === 'error') bg = "bg-red-600 text-white";
+            if (!container) return;
 
-            toast.className = `${bg} px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 pointer-events-auto animate-fade-in`;
-            toast.innerHTML = `
-                <i class="${type === 'success' ? 'fa-solid fa-check-circle' : type === 'error' ? 'fa-solid fa-exclamation-circle' : 'fa-solid fa-info-circle'}"></i>
-                <span>${message}</span>
-            `;
+            const toast = document.createElement('div');
+            let bgClass = "bg-slate-900 text-white";
+            let icon = "fa-circle-info";
+
+            if (type === "success") {
+                bgClass = "bg-emerald-600 text-white";
+                icon = "fa-circle-check";
+            } else if (type === "error") {
+                bgClass = "bg-red-600 text-white";
+                icon = "fa-triangle-exclamation";
+            }
+
+            toast.className = `${bgClass} px-4 py-3 rounded-2xl shadow-xl text-xs font-semibold flex items-center gap-2 animate-fade-in pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${message}</span>`;
 
             container.appendChild(toast);
 
             setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'all 0.3s ease';
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
         }
+
+        // DOM Ready Entry Point
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
     </script>
 </body>
 </html>
