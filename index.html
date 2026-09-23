@@ -41,16 +41,17 @@
 
     <!-- Header / Navigation Bar -->
     <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-30">
-        <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-            <div class="flex items-center space-x-3 cursor-pointer select-none" onclick="handleLogoClick()">
-                <div class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0">
+        <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center gap-2">
+            <div class="flex items-center space-x-3 select-none">
+                <!-- Logo Button (5 Clicks Trigger) -->
+                <div onclick="handleLogoClick()" title="5회 연속 클릭 시 관리자 모드" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md border border-white/20 flex-shrink-0 cursor-pointer hover:bg-white/20 active:scale-95 transition-all">
                     <i class="fa-solid fa-flask-vial text-xl text-indigo-200"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-base sm:text-lg leading-tight flex items-center gap-1.5 flex-wrap">
                         인천중산중 부스 예약 시스템
-                        <button onclick="event.stopPropagation(); openPatchNotesModal();" title="패치노트 확인" class="bg-indigo-500/80 hover:bg-indigo-400 text-[10px] sm:text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-300/30 transition-colors flex items-center gap-1 cursor-pointer">
-                            <span>v1.4</span>
+                        <button onclick="openPatchNotesModal()" title="패치노트 확인" class="bg-indigo-500/80 hover:bg-indigo-400 text-[10px] sm:text-xs px-2 py-0.5 rounded-full text-indigo-100 font-normal border border-indigo-300/30 transition-colors flex items-center gap-1 cursor-pointer active:scale-95">
+                            <span>v1.6</span>
                             <i class="fa-solid fa-clock-rotate-left text-[9px]"></i>
                         </button>
                     </h1>
@@ -58,17 +59,17 @@
                 </div>
             </div>
             
-            <!-- Real-time Sync Status Badge & Admin Button -->
+            <!-- Real-time Sync Status Badge & Direct Admin Button -->
             <div class="flex items-center gap-2">
-                <div id="sync-status-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/30">
+                <div id="sync-status-badge" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium bg-amber-500/20 text-amber-200 border border-amber-400/30">
                     <i class="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
                     <span>연동 확인 중...</span>
                 </div>
 
-                <!-- Admin Button: Hidden by Default (Revealed only after correct PIN) -->
-                <button id="admin-btn" onclick="openAdminDashboard()" class="hidden bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 cursor-pointer">
+                <!-- Admin Button Always Visible -->
+                <button id="admin-btn" onclick="openAdminDashboard()" class="bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white px-3 py-1.5 rounded-xl text-xs font-bold items-center gap-1.5 transition-all shadow-md flex-shrink-0 cursor-pointer flex">
                     <i class="fa-solid fa-user-shield text-xs"></i>
-                    <span class="inline">관리자 모드</span>
+                    <span>관리자</span>
                 </button>
             </div>
         </div>
@@ -85,24 +86,24 @@
                         <i class="fa-regular fa-clock"></i> 부스 운영 안내
                     </span>
                     <span class="text-xs text-slate-400">|</span>
-                    <span class="text-xs font-medium text-slate-600">시간당 6개 타임 / 타임당 10분 진행</span>
+                    <span id="interval-info-badge" class="text-xs font-medium text-slate-600">시간당 4개 타임 / 타임당 15분 진행</span>
                 </div>
                 <h2 class="text-base font-bold text-slate-800">예약 시간대를 선택하여 신청해 주세요</h2>
                 <p class="text-xs text-slate-500">각 시간대별 정원은 <strong class="text-indigo-600 font-semibold">최대 4명</strong>이며, 선착순 마감됩니다.</p>
             </div>
             <div class="flex items-center gap-2 text-xs text-slate-600 bg-amber-50/80 p-2.5 rounded-xl border border-amber-200/80">
                 <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm flex-shrink-0"></i>
-                <span>예약을 완료하시면 타인을 위한 원활한 진행을 위해 <strong>취소가 제한</strong>됩니다.</span>
+                <span>원활한 체험 진행을 위해 <strong>체험 시작 2분 전</strong> 부스 입장을 부탁드립니다.</span>
             </div>
         </div>
 
         <!-- Day Selection Tabs -->
         <div class="bg-slate-200/80 p-1.5 rounded-2xl flex gap-1.5 mb-5 border border-slate-200/60 shadow-inner">
-            <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm">
+            <button id="tab-fri" onclick="switchDay('fri')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm cursor-pointer active:scale-98">
                 <i class="fa-solid fa-calendar-day"></i>
                 <span>금요일 (Day 1)</span>
             </button>
-            <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5">
+            <button id="tab-sat" onclick="switchDay('sat')" class="flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98">
                 <i class="fa-solid fa-calendar-day"></i>
                 <span>토요일 (Day 2)</span>
             </button>
@@ -118,7 +119,7 @@
         <p class="font-medium text-slate-500">인천중산중학교 과학대제전 체험부스 실시간 예약 시스템</p>
         <div class="flex items-center justify-center gap-2 mt-1">
             <p class="text-[11px] text-slate-400">© 2026 Incheon Jungsan Middle School Science Club.</p>
-            <button onclick="openPatchNotesModal()" class="text-[11px] text-indigo-500 hover:underline font-semibold">패치노트 히스토리</button>
+            <button onclick="openPatchNotesModal()" class="text-[11px] text-indigo-500 hover:underline font-semibold cursor-pointer">패치노트 히스토리</button>
         </div>
     </footer>
 
@@ -132,10 +133,10 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-slate-800 text-sm sm:text-base">시스템 패치노트 히스토리</h3>
-                        <p class="text-[11px] text-slate-400">v1.0부터 v1.4까지의 업데이트</p>
+                        <p class="text-[11px] text-slate-400">v1.0부터 v1.6까지의 업데이트 역사</p>
                     </div>
                 </div>
-                <button onclick="closePatchNotesModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100">
+                <button onclick="closePatchNotesModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -143,79 +144,62 @@
             <!-- Scrollable Timeline Content -->
             <div class="overflow-y-auto my-4 pr-1 space-y-4 text-xs flex-grow">
                 
-                <!-- v1.4 -->
+                <!-- v1.6 -->
                 <div class="border-l-2 border-indigo-500 pl-3.5 relative space-y-1">
                     <div class="w-3 h-3 bg-indigo-500 rounded-full absolute -left-[7px] top-0.5 border-2 border-white"></div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-800 text-sm">v1.4</span>
+                        <span class="font-bold text-slate-800 text-sm">v1.6</span>
                         <span class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded-md">현재 버전</span>
-                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.19</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09</span>
                     </div>
                     <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
-                        <li><strong>Firestore 실시간 연동</strong> 예약 데이터 실시간 클라우드 자동 동기화</li>
-                        <li><strong>연동 상태 배지</strong> 상단 헤더에 실시간 DB 연동 상태 배지 표시</li>
-                        <li><strong>보안 접속 체계</strong> 관리자 전용 PIN 인증 체계 구축 및 모드 제어 기능</li>
-                        <li><strong>마크다운 정제</strong> GitHub Pages Jekyll 간섭 예방 및 코드 안정화</li>
+                        <li><strong>⚡ 예약 및 클릭 반응성 최적화:</strong> 네트워크 지연 시 3초 타임아웃 적용 및 로컬 저장소 즉시 백업 처리</li>
+                        <li><strong>🛡️ 관리자 버튼 상시 배치:</strong> 5회 숨김 클릭 대신 상단 관리자 버튼 직접 제공</li>
                     </ul>
                 </div>
 
-                <!-- v1.3 -->
+                <!-- v1.5 -->
                 <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
                     <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-800">v1.3</span>
-                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.18</span>
+                        <span class="font-bold text-slate-800">v1.5</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09</span>
                     </div>
                     <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
-                        <li><strong>세부 아코디언 UI</strong> 시간대별 그룹(10시/11시 등) 접기/펴기 카드 도입</li>
-                        <li><strong>인원 연산 로직</strong> 동반 인원 신청 시 잔여 정원 실시간 초과 검증</li>
+                        <li><strong>⏱️ 15분 간격 기본 적용:</strong> 타임 슬롯 기본 간격을 15분 단위로 변경</li>
+                        <li><strong>⚙️ 관리자 타임 간격 설정:</strong> 관리자 모드에서 5분/10분/15분/20분/30분 타임 간격 실시간 변경 지원</li>
                     </ul>
                 </div>
 
-                <!-- v1.2 -->
+                <!-- v1.4 -->
                 <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
                     <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-800">v1.2</span>
-                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.17</span>
+                        <span class="font-bold text-slate-800">v1.4</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.09</span>
                     </div>
                     <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
-                        <li><strong>관리자 대시보드</strong> 일자별/전체 총 예약자 실시간 통계 산출</li>
-                        <li><strong>CSV 추출</strong> 예약 명단 엑셀 CSV 파일 다운로드 기능</li>
-                        <li><strong>예약 관리</strong> 예약자 검색 및 실시간 예약 취소/삭제</li>
+                        <li><strong>📂 세부 아코디언 UI:</strong> 시간대별 그룹(10시/11시 등) 접기/펴기 카드 도입</li>
+                        <li><strong>👥 인원 연산 로직:</strong> 동반 인원 신청 시 잔여 정원 실시간 초과 검증</li>
                     </ul>
                 </div>
 
-                <!-- v1.1 -->
+                <!-- v1.0 ~ v1.2 -->
                 <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
                     <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
                     <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-800">v1.1</span>
-                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.17</span>
+                        <span class="font-bold text-slate-800">v1.0 ~ v1.2</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">2026.05 ~ 07</span>
                     </div>
                     <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
-                        <li><strong>전자 티켓 발급</strong> 예약 신청 완료 시 전용 티켓 번호 모달 표시</li>
-                        <li><strong>마감 자동 처리</strong> 정원(4명) 초과 시 선택 불가 처리</li>
-                    </ul>
-                </div>
-
-                <!-- v1.0 -->
-                <div class="border-l-2 border-slate-200 pl-3.5 relative space-y-1">
-                    <div class="w-2.5 h-2.5 bg-slate-300 rounded-full absolute -left-[5.5px] top-1 border-2 border-white"></div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold text-slate-800">v1.0</span>
-                        <span class="text-[10px] text-slate-400 ml-auto">2026.09.17</span>
-                    </div>
-                    <ul class="list-disc list-inside text-slate-600 space-y-1 leading-relaxed pl-1">
-                        <li><strong>예약 시스템 탄생</strong> 금/토 1~3부 10분 타임 운영 스펙 구현</li>
-                        <li><strong>반응형 UI</strong> 스마트폰 및 PC 환경 최적화 설계</li>
+                        <li>전자 티켓 발급, 관리자 CSV 다운로드 및 예약 취소 기능 완성</li>
                     </ul>
                 </div>
 
             </div>
 
             <div class="pt-2 border-t border-slate-100 flex-shrink-0">
-                <button onclick="closePatchNotesModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">
+                <button onclick="closePatchNotesModal()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer">
                     확인 및 닫기
                 </button>
             </div>
@@ -228,9 +212,9 @@
             <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
                 <div>
                     <span class="bg-indigo-100 text-indigo-700 text-[11px] font-bold px-2.5 py-1 rounded-md">예약 신청</span>
-                    <h3 id="modal-slot-info" class="text-base font-bold text-slate-800 mt-1">금요일 | 10:00 - 10:10</h3>
+                    <h3 id="modal-slot-info" class="text-base font-bold text-slate-800 mt-1">금요일 | 10:00 - 10:15</h3>
                 </div>
-                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100">
+                <button onclick="closeBookingModal()" class="text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-100 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -261,8 +245,8 @@
                 </div>
 
                 <div class="flex gap-2 pt-1">
-                    <button type="button" onclick="closeBookingModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
-                    <button type="submit" id="submit-booking-btn" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md transition-all">예약 완료하기</button>
+                    <button type="button" onclick="closeBookingModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs cursor-pointer active:scale-98">취소</button>
+                    <button type="submit" id="submit-booking-btn" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer">예약 완료하기</button>
                 </div>
             </form>
         </div>
@@ -296,7 +280,7 @@
                 </div>
             </div>
 
-            <button onclick="closeTicketModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm shadow-md transition-all">
+            <button onclick="closeTicketModal()" class="w-full py-3 bg-slate-900 hover:bg-slate-800 active:scale-98 text-white rounded-xl font-bold text-sm shadow-md transition-all cursor-pointer">
                 확인 및 창 닫기
             </button>
         </div>
@@ -319,8 +303,8 @@
                 </div>
                 <p id="auth-error-msg" class="text-[11px] text-red-500 text-center hidden font-medium">비밀번호(PIN)가 일치하지 않습니다.</p>
                 <div class="flex gap-2 pt-1">
-                    <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs">취소</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm">인증하기</button>
+                    <button type="button" onclick="closeAdminAuthModal()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl font-medium text-xs cursor-pointer active:scale-98">취소</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-sm cursor-pointer active:scale-98">인증하기</button>
                 </div>
             </form>
         </div>
@@ -337,15 +321,23 @@
                     <h2 class="font-bold text-sm sm:text-base">과학대제전 예약관리 모드</h2>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="openFirebaseConfigModal()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                    <button onclick="openIntervalConfigModal()" class="bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95">
+                        <i class="fa-solid fa-clock"></i>
+                        <span class="hidden sm:inline">시간 간격 설정</span>
+                    </button>
+                    <button onclick="openFirebaseConfigModal()" class="bg-indigo-700 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95">
                         <i class="fa-solid fa-database text-indigo-200"></i>
                         <span class="hidden sm:inline">Firebase DB 설정</span>
                     </button>
-                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm">
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95">
                         <i class="fa-solid fa-file-csv"></i>
                         <span class="hidden sm:inline">CSV 다운로드</span>
                     </button>
-                    <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-800 transition-colors">
+                    <button onclick="handleAdminLogout()" class="bg-rose-700 hover:bg-rose-600 text-white px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer active:scale-95" title="로그아웃">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span class="hidden sm:inline">로그아웃</span>
+                    </button>
+                    <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-slate-800 transition-colors cursor-pointer">
                         <i class="fa-solid fa-xmark text-lg"></i>
                     </button>
                 </div>
@@ -375,9 +367,9 @@
             <div class="p-4 sm:p-6 flex-grow flex flex-col overflow-hidden bg-slate-50/50">
                 <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 mb-4 flex-shrink-0">
                     <div class="flex items-center gap-1.5">
-                        <button id="admin-filter-all" onclick="filterAdminData('all')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm">전체 보기</button>
-                        <button id="admin-filter-fri" onclick="filterAdminData('fri')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100">금요일</button>
-                        <button id="admin-filter-sat" onclick="filterAdminData('sat')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100">토요일</button>
+                        <button id="admin-filter-all" onclick="filterAdminData('all')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm cursor-pointer">전체 보기</button>
+                        <button id="admin-filter-fri" onclick="filterAdminData('fri')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">금요일</button>
+                        <button id="admin-filter-sat" onclick="filterAdminData('sat')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer">토요일</button>
                     </div>
                     <div class="relative">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -412,6 +404,46 @@
     <!-- Toast Alert Container -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
+    <!-- Time Interval Setup Modal -->
+    <div id="interval-config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center">
+                        <i class="fa-solid fa-stopwatch text-lg"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">예약 시간 간격 설정</h3>
+                        <p class="text-xs text-slate-500">체험 타임 슬롯 간격을 조정합니다.</p>
+                    </div>
+                </div>
+                <button onclick="closeIntervalConfigModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3 my-4">
+                <label class="block text-xs font-semibold text-slate-700">시간 간격 선택</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <button type="button" onclick="selectIntervalOption(5)" class="interval-opt-btn p-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer" data-value="5">5분</button>
+                    <button type="button" onclick="selectIntervalOption(10)" class="interval-opt-btn p-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer" data-value="10">10분</button>
+                    <button type="button" onclick="selectIntervalOption(15)" class="interval-opt-btn p-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer" data-value="15">15분 (기본)</button>
+                    <button type="button" onclick="selectIntervalOption(20)" class="interval-opt-btn p-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer" data-value="20">20분</button>
+                    <button type="button" onclick="selectIntervalOption(30)" class="interval-opt-btn p-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer" data-value="30">30분</button>
+                </div>
+                <p class="text-[11px] text-amber-700 bg-amber-50 p-2.5 rounded-xl border border-amber-200/70 flex gap-1.5 items-start">
+                    <i class="fa-solid fa-circle-info text-xs mt-0.5 flex-shrink-0"></i>
+                    <span>간격을 변경하면 부스 예약 타임 슬롯이 즉시 설정된 간격으로 다시 계산됩니다.</span>
+                </p>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="button" onclick="closeIntervalConfigModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium text-xs cursor-pointer">취소</button>
+                <button type="button" onclick="applyIntervalConfig()" class="flex-1 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold text-xs shadow-md transition-all cursor-pointer">적용하기</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase Config Setup Modal -->
     <div id="firebase-config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 animate-fade-in">
@@ -425,7 +457,7 @@
                         <p class="text-xs text-slate-500">현재 연결된 Firebase 설정을 변경하거나 재설정할 수 있습니다.</p>
                     </div>
                 </div>
-                <button onclick="closeFirebaseConfigModal()" class="text-slate-400 hover:text-slate-600">
+                <button onclick="closeFirebaseConfigModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -446,9 +478,9 @@
                     <p>• 기본 구성이 적용되어 있습니다. 별도로 변경하실 경우에만 수정하세요.</p>
                 </div>
                 <div class="flex gap-2">
-                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-medium text-xs">기본값 복원</button>
-                    <button type="button" onclick="closeFirebaseConfigModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium text-xs">취소</button>
-                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md">저장 및 적용</button>
+                    <button type="button" onclick="clearFirebaseConfig()" class="py-2.5 px-3 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl font-medium text-xs cursor-pointer">기본값 복원</button>
+                    <button type="button" onclick="closeFirebaseConfigModal()" class="flex-1 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-medium text-xs cursor-pointer">취소</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-md cursor-pointer">저장 및 적용</button>
                 </div>
             </form>
         </div>
@@ -482,65 +514,78 @@
         let reservations = [];
         let selectedSlot = null;
         let currentAdminFilter = 'all';
+
+        // Logo 5-click Counter State
         let logoClickCount = 0;
         let logoClickTimer = null;
+        
+        // Time Slot Interval State (Default: 15 mins)
+        let slotInterval = parseInt(localStorage.getItem('slot_interval_' + appId)) || 15;
+        let tempSelectedInterval = slotInterval;
 
-        // Session & Sub-group Expansion Accordion State
-        let openSessions = { 1: true, 2: false, 3: false };
-        let openSubGroups = {
-            '1-1': true, '1-2': false,
-            '2-1': true, '2-2': false,
-            '3-1': true, '3-2': false
-        };
-
+        // Operating Sessions Configuration
         const SESSIONS = [
-            { 
-                id: 1, 
-                title: '1부', 
-                start: '10:00', 
-                end: '12:00',
+            {
+                id: 1,
+                title: "1부 (오전 타임)",
+                start: "10:00",
+                end: "12:00",
                 subGroups: [
-                    { id: '1-1', title: '10시 시간대', start: '10:00', end: '11:00' },
-                    { id: '1-2', title: '11시 시간대', start: '11:00', end: '12:00' }
+                    { id: "1-1", title: "10시 대역", start: "10:00", end: "11:00" },
+                    { id: "1-2", title: "11시 대역", start: "11:00", end: "12:00" }
                 ]
             },
-            { 
-                id: 2, 
-                title: '2부', 
-                start: '13:00', 
-                end: '15:00',
+            {
+                id: 2,
+                title: "2부 (오후 A타임)",
+                start: "13:00",
+                end: "15:00",
                 subGroups: [
-                    { id: '2-1', title: '13시 시간대', start: '13:00', end: '14:00' },
-                    { id: '2-2', title: '14시 시간대', start: '14:00', end: '15:00' }
+                    { id: "2-1", title: "13시 대역", start: "13:00", end: "14:00" },
+                    { id: "2-2", title: "14시 대역", start: "14:00", end: "15:00" }
                 ]
             },
-            { 
-                id: 3, 
-                title: '3부', 
-                start: '15:00', 
-                end: '17:00',
+            {
+                id: 3,
+                title: "3부 (오후 B타임)",
+                start: "15:00",
+                end: "16:30",
                 subGroups: [
-                    { id: '3-1', title: '15시 시간대', start: '15:00', end: '16:00' },
-                    { id: '3-2', title: '16시 시간대', start: '16:00', end: '17:00' }
+                    { id: "3-1", title: "15시 대역", start: "15:00", end: "16:00" },
+                    { id: "3-2", title: "16시 대역", start: "16:00", end: "16:30" }
                 ]
             }
         ];
 
-        // 10-Minute Interval Time Slot Generator
+        let openSessions = { 1: true, 2: false, 3: false };
+        let openSubGroups = { "1-1": true, "1-2": false, "2-1": false, "2-2": false, "3-1": false, "3-2": false };
+
+        // Promise Timeout Helper
+        function withTimeout(promise, ms = 3000) {
+            return new Promise((resolve, reject) => {
+                const timer = setTimeout(() => {
+                    reject(new Error("Timeout"));
+                }, ms);
+                promise.then(
+                    res => { clearTimeout(timer); resolve(res); },
+                    err => { clearTimeout(timer); reject(err); }
+                );
+            });
+        }
+
+        // Interval-based Time Generator
         function generateTimesForSession(startTime, endTime) {
             const times = [];
             let [h, m] = startTime.split(':').map(Number);
             const [endH, endM] = endTime.split(':').map(Number);
-            const endTotal = endH * 60 + endM;
+            let totalM = h * 60 + m;
+            const endTotalM = endH * 60 + endM;
 
-            while (h * 60 + m < endTotal) {
-                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-                times.push(timeStr);
-                m += 10;
-                if (m >= 60) {
-                    m -= 60;
-                    h += 1;
-                }
+            while (totalM < endTotalM) {
+                const curH = Math.floor(totalM / 60);
+                const curM = totalM % 60;
+                times.push(`${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}`);
+                totalM += slotInterval;
             }
             return times;
         }
@@ -549,11 +594,7 @@
         function loadLocalReservations() {
             try {
                 const stored = localStorage.getItem('science_reservations_' + appId);
-                if (stored) {
-                    reservations = JSON.parse(stored);
-                } else {
-                    reservations = [];
-                }
+                reservations = stored ? JSON.parse(stored) : [];
             } catch(e) {
                 console.error("Local storage load error:", e);
                 reservations = [];
@@ -573,7 +614,7 @@
             const badge = document.getElementById('sync-status-badge');
             if (!badge) return;
 
-            badge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium transition-all ";
+            badge.className = "hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-medium transition-all ";
 
             if (status === 'connected') {
                 badge.classList.add('bg-emerald-500/20', 'text-emerald-200', 'border', 'border-emerald-400/30');
@@ -587,14 +628,10 @@
         // Initialize Application
         async function initApp() {
             loadLocalReservations();
+            updateIntervalBadgeText();
             renderTimeSlots();
 
-            // If already authenticated during this session, reveal admin button
-            if (sessionStorage.getItem('admin_authenticated') === 'true') {
-                showAdminButton();
-            }
-
-            // Load Firebase Config from localStorage or Fall back to DEFAULT_FIREBASE_CONFIG
+            // Load Firebase Config
             let firebaseConfig = DEFAULT_FIREBASE_CONFIG;
             const storedConfigStr = localStorage.getItem('custom_firebase_config');
 
@@ -609,7 +646,6 @@
                     db = getFirestore(app);
                     reservationsRef = collection(db, 'science_reservations');
 
-                    // Try anonymous sign-in
                     try {
                         if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                             await signInWithCustomToken(auth, __initial_auth_token);
@@ -617,10 +653,9 @@
                             await signInAnonymously(auth);
                         }
                     } catch (authErr) {
-                        console.warn("Firebase Auth Notice (Anonymous sign-in skipped or failed):", authErr);
+                        console.warn("Firebase Auth Notice:", authErr);
                     }
 
-                    // Subscribe to real-time Firestore updates
                     onSnapshot(reservationsRef, (snapshot) => {
                         isFirebaseReady = true;
                         const firebaseData = [];
@@ -631,31 +666,24 @@
                             });
                         });
                         reservations = firebaseData;
+                        saveLocalReservations();
                         updateSyncStatus('connected', '실시간 동기화 중');
                         renderTimeSlots();
                         updateAdminStats();
                         renderAdminTable();
                     }, (error) => {
-                        console.error("Firestore error (Check Firebase Console Security Rules & Database):", error);
+                        console.warn("Firestore listener warning:", error);
                         isFirebaseReady = false;
-                        updateSyncStatus('local', '로컬 저장소 모드 (Firebase 권한 확인)');
+                        updateSyncStatus('local', '로컬 단독 저장 모드');
                     });
 
                 } catch (err) {
                     console.error("Firebase Initialization Error:", err);
                     isFirebaseReady = false;
-                    updateSyncStatus('local', '로컬 저장소 모드');
+                    updateSyncStatus('local', '로컬 단독 저장 모드');
                 }
             } else {
-                updateSyncStatus('local', '로컬 저장소 모드');
-            }
-        }
-
-        function showAdminButton() {
-            const adminBtn = document.getElementById('admin-btn');
-            if (adminBtn) {
-                adminBtn.classList.remove('hidden');
-                adminBtn.classList.add('flex');
+                updateSyncStatus('local', '로컬 단독 저장 모드');
             }
         }
 
@@ -732,13 +760,14 @@
                         const remaining = Math.max(0, 4 - bookedCount);
                         const isFull = remaining === 0;
 
-                        const slotBtn = document.createElement('div');
-                        slotBtn.className = `p-2.5 rounded-xl border transition-all text-center flex flex-col justify-between select-none ${
+                        const slotBtn = document.createElement('button');
+                        slotBtn.type = "button";
+                        slotBtn.className = `p-2.5 rounded-xl border transition-all text-center flex flex-col justify-between select-none active:scale-95 ${
                             isFull 
-                                ? 'bg-slate-100 border-slate-200 text-slate-400 opacity-75' 
+                                ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-75' 
                                 : remaining <= 2
-                                    ? 'bg-amber-50/60 border-amber-200 hover:border-amber-400 cursor-pointer hover:shadow-sm'
-                                    : 'bg-indigo-50/40 border-indigo-100 hover:border-indigo-400 cursor-pointer hover:shadow-sm'
+                                    ? 'bg-amber-50/70 border-amber-300 hover:border-amber-500 cursor-pointer shadow-2xs hover:shadow-sm'
+                                    : 'bg-indigo-50/50 border-indigo-200 hover:border-indigo-400 cursor-pointer shadow-2xs hover:shadow-sm'
                         }`;
 
                         if (!isFull) {
@@ -746,10 +775,10 @@
                         }
 
                         slotBtn.innerHTML = `
-                            <div class="font-bold text-xs sm:text-sm text-slate-800 mb-1 flex items-center justify-center gap-1">
+                            <div class="font-bold text-xs sm:text-sm text-slate-800 mb-1 flex items-center justify-center gap-1 w-full">
                                 ${time}
                             </div>
-                            <div>
+                            <div class="w-full">
                                 ${isFull 
                                     ? `<span class="inline-block bg-slate-200 text-slate-600 text-[10px] font-bold px-1.5 py-0.5 rounded-full">마감 (4/4)</span>` 
                                     : `<span class="inline-block ${remaining <= 2 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'} text-[10px] font-bold px-1.5 py-0.5 rounded-full">
@@ -814,11 +843,11 @@
             const tabSat = document.getElementById('tab-sat');
             
             if (day === 'fri') {
-                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm";
-                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5";
+                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm cursor-pointer active:scale-98";
+                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98";
             } else {
-                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm";
-                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5";
+                tabSat.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 bg-white text-indigo-600 shadow-sm cursor-pointer active:scale-98";
+                tabFri.className = "flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:text-slate-900 transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98";
             }
             
             renderTimeSlots();
@@ -829,12 +858,9 @@
             const dayKr = currentDay === 'fri' ? '금요일' : '토요일';
             
             const [h, m] = timeStr.split(':').map(Number);
-            let endM = m + 10;
-            let endH = h;
-            if (endM >= 60) {
-                endM = 0;
-                endH += 1;
-            }
+            let totalEnd = h * 60 + m + slotInterval;
+            let endH = Math.floor(totalEnd / 60);
+            let endM = totalEnd % 60;
             const endTimeStr = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
             
             document.getElementById('modal-slot-info').innerText = `${dayKr} | ${timeStr} - ${endTimeStr}`;
@@ -854,6 +880,10 @@
             document.getElementById('guest-phone').value = '';
             
             document.getElementById('booking-modal').classList.remove('hidden');
+            setTimeout(() => {
+                const nameInput = document.getElementById('guest-name');
+                if (nameInput) nameInput.focus();
+            }, 100);
         };
 
         window.closeBookingModal = function() {
@@ -884,7 +914,7 @@
             
             const submitBtn = document.getElementById('submit-booking-btn');
             submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> 예약 처리 중...`;
+            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> 처리 중...`;
             
             const ticketCode = 'SCI-' + Math.floor(1000 + Math.random() * 9000);
             const newRes = {
@@ -897,69 +927,64 @@
                 createdAt: new Date().toISOString()
             };
 
-            try {
-                if (isFirebaseReady && reservationsRef) {
-                    await addDoc(reservationsRef, newRes);
-                } else {
-                    newRes.id = 'loc-' + Date.now();
-                    reservations.push(newRes);
-                    saveLocalReservations();
-                    renderTimeSlots();
+            let savedToCloud = false;
+
+            if (isFirebaseReady && reservationsRef) {
+                try {
+                    await withTimeout(addDoc(reservationsRef, newRes), 3000);
+                    savedToCloud = true;
+                } catch (err) {
+                    console.warn("Cloud save timeout or failed, falling back to local storage:", err);
                 }
-
-                closeBookingModal();
-                showTicketModal(newRes);
-                showToast("예약이 성공적으로 완료 되었습니다!", "success");
-            } catch (err) {
-                console.error("Booking submit error:", err);
-                showToast("예약 저장 중 오류가 발생했습니다.", "error");
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = "예약 완료하기";
             }
-        };
 
-        function showTicketModal(resData) {
-            const dayKr = resData.day === 'fri' ? '금요일' : '토요일';
-            document.getElementById('ticket-code').innerText = resData.ticketCode;
-            document.getElementById('ticket-datetime').innerText = `${dayKr} ${resData.time}`;
-            document.getElementById('ticket-name').innerText = resData.name;
-            document.getElementById('ticket-count').innerText = `${resData.partySize || 1}명`;
+            if (!savedToCloud) {
+                newRes.id = 'loc-' + Date.now();
+                reservations.push(newRes);
+                saveLocalReservations();
+            }
 
+            renderTimeSlots();
+            updateAdminStats();
+            renderAdminTable();
+
+            // Display electronic ticket modal
+            document.getElementById('ticket-code').innerText = ticketCode;
+            document.getElementById('ticket-datetime').innerText = `${selectedSlot.day === 'fri' ? '금요일' : '토요일'} ${selectedSlot.time}`;
+            document.getElementById('ticket-name').innerText = name;
+            document.getElementById('ticket-count').innerText = `${count}명`;
             document.getElementById('ticket-modal').classList.remove('hidden');
-        }
+
+            closeBookingModal();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `예약 완료하기`;
+            showToast("예약이 성공적으로 완료되었습니다!", "success");
+        };
 
         window.closeTicketModal = function() {
             document.getElementById('ticket-modal').classList.add('hidden');
         };
 
-        // Click Logo 5 times to open PIN input modal directly
         window.handleLogoClick = function() {
-            if (sessionStorage.getItem('admin_authenticated') === 'true') {
-                openAdminDashboard();
-                return;
-            }
-
             logoClickCount++;
-            clearTimeout(logoClickTimer);
-            logoClickTimer = setTimeout(() => {
-                logoClickCount = 0;
-            }, 3000);
+            if (logoClickTimer) clearTimeout(logoClickTimer);
 
             if (logoClickCount >= 5) {
                 logoClickCount = 0;
-                document.getElementById('admin-auth-modal').classList.remove('hidden');
-                document.getElementById('admin-pin-input').value = '';
-                document.getElementById('auth-error-msg').classList.add('hidden');
-                setTimeout(() => {
-                    const pinInput = document.getElementById('admin-pin-input');
-                    if (pinInput) pinInput.focus();
-                }, 100);
+                openAdminDashboard();
+            } else {
+                const remaining = 5 - logoClickCount;
+                if (remaining <= 3) {
+                    showToast(`관리자 모드 진입까지 ${remaining}회 남았습니다.`, "info");
+                }
+                logoClickTimer = setTimeout(() => {
+                    logoClickCount = 0;
+                }, 3000);
             }
         };
 
         window.openAdminDashboard = function() {
-            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+            if (localStorage.getItem('admin_authenticated') === 'true' || sessionStorage.getItem('admin_authenticated') === 'true') {
                 document.getElementById('admin-dashboard-modal').classList.remove('hidden');
                 updateAdminStats();
                 renderAdminTable();
@@ -967,6 +992,10 @@
                 document.getElementById('admin-auth-modal').classList.remove('hidden');
                 document.getElementById('admin-pin-input').value = '';
                 document.getElementById('auth-error-msg').classList.add('hidden');
+                setTimeout(() => {
+                    const pinInput = document.getElementById('admin-pin-input');
+                    if (pinInput) pinInput.focus();
+                }, 100);
             }
         };
 
@@ -978,18 +1007,25 @@
             e.preventDefault();
             const pin = document.getElementById('admin-pin-input').value.trim();
             if (pin === MASTER_PIN) {
+                localStorage.setItem('admin_authenticated', 'true');
                 sessionStorage.setItem('admin_authenticated', 'true');
                 closeAdminAuthModal();
-                showAdminButton();
 
                 document.getElementById('admin-dashboard-modal').classList.remove('hidden');
                 updateAdminStats();
                 renderAdminTable();
 
-                showToast("관리자 인증에 성공했습니다.", "success");
+                showToast("관리자 인증에 성공했습니다. (인증 상태가 유지됩니다)", "success");
             } else {
                 document.getElementById('auth-error-msg').classList.remove('hidden');
             }
+        };
+
+        window.handleAdminLogout = function() {
+            localStorage.removeItem('admin_authenticated');
+            sessionStorage.removeItem('admin_authenticated');
+            closeAdminDashboard();
+            showToast("관리자 모드에서 로그아웃 되었습니다.", "info");
         };
 
         window.closeAdminDashboard = function() {
@@ -1018,8 +1054,8 @@
             const btnFri = document.getElementById('admin-filter-fri');
             const btnSat = document.getElementById('admin-filter-sat');
 
-            const activeClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm";
-            const inactiveClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100";
+            const activeClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white shadow-sm cursor-pointer";
+            const inactiveClass = "px-3 py-1.5 rounded-xl text-xs font-bold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 cursor-pointer";
 
             if (btnAll) btnAll.className = day === 'all' ? activeClass : inactiveClass;
             if (btnFri) btnFri.className = day === 'fri' ? activeClass : inactiveClass;
@@ -1074,7 +1110,7 @@
                         <td class="p-3 font-mono text-slate-600">${r.phone}</td>
                         <td class="p-3 font-bold text-slate-700">${r.partySize || 1}명</td>
                         <td class="p-3 text-center">
-                            <button onclick="deleteReservation('${r.id}')" class="px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold text-[11px] transition-colors">
+                            <button onclick="deleteReservation('${r.id}')" class="px-2.5 py-1 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg font-semibold text-[11px] transition-colors cursor-pointer">
                                 취소/삭제
                             </button>
                         </td>
@@ -1091,19 +1127,18 @@
             try {
                 if (isFirebaseReady && db && !id.startsWith('loc-')) {
                     const docRef = doc(db, 'science_reservations', id);
-                    await deleteDoc(docRef);
-                } else {
-                    reservations = reservations.filter(r => r.id !== id);
-                    saveLocalReservations();
-                    renderTimeSlots();
-                    updateAdminStats();
-                    renderAdminTable();
+                    await withTimeout(deleteDoc(docRef), 3000);
                 }
-                showToast("예약이 취소되었습니다.", "info");
             } catch (err) {
-                console.error("Delete error:", err);
-                showToast("삭제 처리 중 오류가 발생했습니다.", "error");
+                console.warn("Cloud delete failed or timed out:", err);
             }
+
+            reservations = reservations.filter(r => r.id !== id);
+            saveLocalReservations();
+            renderTimeSlots();
+            updateAdminStats();
+            renderAdminTable();
+            showToast("예약이 취소되었습니다.", "info");
         };
 
         window.exportToCSV = function() {
@@ -1161,6 +1196,50 @@
             localStorage.removeItem('custom_firebase_config');
             showToast("Firebase 설정이 기본값으로 복원되었습니다. 새로고침합니다.", "info");
             setTimeout(() => window.location.reload(), 800);
+        };
+
+        // Time Interval Setting Handlers
+        function updateIntervalBadgeText() {
+            const badge = document.getElementById('interval-info-badge');
+            if (badge) {
+                const countPerHour = Math.floor(60 / slotInterval);
+                badge.innerText = `시간당 ${countPerHour}개 타임 / 타임당 ${slotInterval}분 진행`;
+            }
+        }
+
+        window.openIntervalConfigModal = function() {
+            tempSelectedInterval = slotInterval;
+            highlightIntervalButton(tempSelectedInterval);
+            document.getElementById('interval-config-modal').classList.remove('hidden');
+        };
+
+        window.closeIntervalConfigModal = function() {
+            document.getElementById('interval-config-modal').classList.add('hidden');
+        };
+
+        window.selectIntervalOption = function(val) {
+            tempSelectedInterval = val;
+            highlightIntervalButton(val);
+        };
+
+        function highlightIntervalButton(val) {
+            const btns = document.querySelectorAll('.interval-opt-btn');
+            btns.forEach(btn => {
+                if (parseInt(btn.getAttribute('data-value')) === val) {
+                    btn.className = "interval-opt-btn p-2.5 rounded-xl border-2 border-amber-500 bg-amber-50 text-xs font-bold text-amber-900 shadow-sm transition-all cursor-pointer";
+                } else {
+                    btn.className = "interval-opt-btn p-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer";
+                }
+            });
+        }
+
+        window.applyIntervalConfig = function() {
+            slotInterval = tempSelectedInterval;
+            localStorage.setItem('slot_interval_' + appId, slotInterval);
+            updateIntervalBadgeText();
+            renderTimeSlots();
+            closeIntervalConfigModal();
+            showToast(`예약 시간 간격이 ${slotInterval}분으로 변경되었습니다.`, "success");
         };
 
         // Utility: Toast Alert
